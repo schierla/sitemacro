@@ -1,8 +1,9 @@
 {
 	"manifest_version": 2,
-	"name": "SiteMacro",
-	"version": "0.0.1",
-	"description": "Record macros for websites and automatically submit forms on user defined pages.",
+	"name": "__MSG_extensionName__",
+	"version": "0.1",
+	"description": "__MSG_extensionDescription__",
+	"default_locale": "en",
 	"icons": {
 		"16": "icons/icon-16.png",
 		"24": "icons/icon-24.png",
@@ -24,11 +25,14 @@
 			"48": "icons/icon-48.png",
 			"64": "icons/icon-64.png"
 		},
-		"default_title": "SiteMacro"
+		"default_title": "__MSG_statusIdle__"
 	},
 	"background": {
 		"scripts": [
 			"scripts/background.js"
 		]
+	},
+	"options_ui": {
+		"page": "options.htm"
 	}
 }

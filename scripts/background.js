@@ -1,7 +1,5 @@
 "use strict"; 
 
-console.log("Activating SiteMacro");
-
 var siteMacro = {
 
     database: {},
@@ -10,22 +8,26 @@ var siteMacro = {
         var key = "data/" + e.url;
         if(key in siteMacro.database) {
             var data = siteMacro.database[key];
-            if(Date.now() - data.last < 15000) {
-                chrome.browserAction.setBadgeText({text: "=", tabId: e.tabId});
-                chrome.browserAction.setTitle({title: "SiteMacro: Not submitting form, page repeated too quickly.", tabId: e.tabId });
+            if(Date.now() - data.last < 10000) {
+                chrome.browserAction.setBadgeText({text: chrome.i18n.getMessage("badgeThrottled"), tabId: e.tabId});
+                chrome.browserAction.setTitle({title: chrome.i18n.getMessage("statusThrottled"), tabId: e.tabId });
                 return;
             } 
             
-            chrome.browserAction.setBadgeText({text: "+", tabId: e.tabId});
-            chrome.browserAction.setTitle({title: "SiteMacro: Filling form...", tabId: e.tabId });
+            chrome.browserAction.setBadgeText({text: chrome.i18n.getMessage("badgeActive"), tabId: e.tabId});
+            chrome.browserAction.setTitle({title: chrome.i18n.getMessage("statusActive"), tabId: e.tabId });
             
             chrome.tabs.executeScript(e.tabId, {file: "/scripts/replay.js"}, () => {
                 chrome.tabs.sendMessage(e.tabId, data.steps, (resp) => {
-                    chrome.browserAction.setBadgeText({text: resp, tabId: e.tabId});
-                    if(resp == "-") {
-                        chrome.browserAction.setTitle({title: "SiteMacro: Failed to submit form, required element not found.", tabId: e.tabId });
-                    } else if(resp == "+") {
-                        chrome.browserAction.setTitle({title: "SiteMacro: Successfullly submitted form.", tabId: e.tabId });                        
+                    switch(resp) {
+                    case chrome.i18n.getMessage("badgeFailed"):
+                        chrome.browserAction.setBadgeText({text: resp, tabId: e.tabId});
+                        chrome.browserAction.setTitle({title: chrome.i18n.getMessage("statusFailed"), tabId: e.tabId });
+                        break;
+                    case chrome.i18n.getMessage("badgeCompleted"):
+                        chrome.browserAction.setBadgeText({text: resp, tabId: e.tabId});
+                        chrome.browserAction.setTitle({title: chrome.i18n.getMessage("statusCompleted"), tabId: e.tabId });                        
+                        break;
                     }
                 });
             });
@@ -37,33 +39,48 @@ var siteMacro = {
 
     clicked: function(tab) {
         chrome.browserAction.getBadgeText({tabId: tab.id}, text => {
-            if(text == "*") {
-                chrome.tabs.sendMessage(tab.id, "abort");
-                chrome.browserAction.setBadgeText({text: "", tabId: tab.id});
-                chrome.browserAction.setTitle({title: "SiteMacro", tabId: tab.id });                
-                return;
-            } else if(text == "+" || text == "-" || text == "=") {
+            switch(text) {
+            case chrome.i18n.getMessage("badgeRecording"):
+                chrome.tabs.sendMessage(tab.id, "cancel");
+                chrome.browserAction.setBadgeText({text: chrome.i18n.getMessage("badgeIdle"), tabId: tab.id});
+                chrome.browserAction.setTitle({title: chrome.i18n.getMessage("statusIdle"), tabId: tab.id });                
+                break;
+            case chrome.i18n.getMessage("badgeActive"):
+            case chrome.i18n.getMessage("badgeFailed") :
+            case chrome.i18n.getMessage("badgeCompleted"):
+            case chrome.i18n.getMessage("badgeThrottled"):
                 var key = "data/" + tab.url;
                 chrome.storage.local.remove(key);
                 delete siteMacro.database[key];
-                chrome.browserAction.setBadgeText({text: "", tabId: tab.id});
-                chrome.browserAction.setTitle({title: "SiteMacro", tabId: tab.id });                
-                return;
-            } else {
-                console.log(tab.url);
-                chrome.tabs.executeScript(tab.id, {file: "/scripts/page.js"});
-                chrome.browserAction.setBadgeText({text: "*", tabId: tab.id});    
-                chrome.browserAction.setTitle({title: "SiteMacro: Recording... Click to cancel.", tabId: tab.id });
+                chrome.browserAction.setBadgeText({text: chrome.i18n.getMessage("badgeIdle"), tabId: tab.id});
+                chrome.browserAction.setTitle({title: chrome.i18n.getMessage("statusIdle"), tabId: tab.id });                
+                break;
+            default:
+                chrome.tabs.executeScript(tab.id, {file: "/scripts/record.js"});
+                chrome.browserAction.setBadgeText({text: chrome.i18n.getMessage("badgeRecording"), tabId: tab.id});    
+                chrome.browserAction.setTitle({title: chrome.i18n.getMessage("statusRecording"), tabId: tab.id });
+                break;
             }
         });
     }, 
 
-    message: function(msg) {
-        console.log("Received steps for " + msg.url);
-        var data = {}, key = "data/" + msg.url;
-        data[key] = {steps: msg.steps, created: Date.now(), last: Date.now() - 15000};
-        chrome.storage.local.set(data, () => {});
-        siteMacro.database[key] = data[key];
+    message: function(msg, sender) {
+        if(msg.command == "add") {
+            console.log("SiteMacro: Received steps for " + msg.url);
+            var data = {}, key = "data/" + msg.url;
+            data[key] = {steps: msg.steps, created: Date.now(), last: Date.now() - 15000};
+            chrome.storage.local.set(data, () => {});
+            siteMacro.database[key] = data[key];
+            chrome.browserAction.setBadgeText({text: chrome.i18n.getMessage("badgeIdle"), tabId: sender.tab.id});
+            chrome.browserAction.setTitle({title: chrome.i18n.getMessage("statusIdle"), tabId: sender.tab.id });      
+        } else if(msg.command == "delete") {
+            var key = "data/" + msg.url;
+            chrome.storage.local.remove(key);
+            delete siteMacro.database[key];
+        } else if(msg.command == "cancel") {   
+            chrome.browserAction.setBadgeText({text: chrome.i18n.getMessage("badgeIdle"), tabId: sender.tab.id});
+            chrome.browserAction.setTitle({title: chrome.i18n.getMessage("statusIdle"), tabId: sender.tab.id });      
+        }
     },
 
     init: function() {

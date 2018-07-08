@@ -1,0 +1,112 @@
+﻿{
+    "extensionName": {
+        "message": "SiteMacro", 
+        "description": "Name of the extension" 
+    },
+    "extensionDescription": {
+        "message": "Record macros to automatically perform actions or submit forms on user defined websites.",
+        "description": "Description of the extension"
+    },
+
+    "statusIdle": {
+        "message": "SiteMacro", 
+        "description": "Default tooltip"
+    },
+    "badgeIdle": {
+        "message": "", 
+        "description": "Default Badge text"
+    },
+    "statusThrottled": {
+        "message": "SiteMacro did not execute a macro: Page repeated too quickly. \nClick to delete the macro.", 
+        "description": "Tooltip when returning to page too quickly" 
+    },
+    "badgeThrottled": {
+        "message": "❙❙", 
+        "description": "Badge text when returning to page too quickly"
+    },
+    "statusActive": {
+        "message": "SiteMacro is executing a macro.", 
+        "description": "Tooltip while executing the macro"
+    },
+    "badgeActive": {
+        "message": "►",
+        "description": "Badge text while executing the macro"
+    },
+    "statusFailed": {
+        "message": "SiteMacro failed to execute a macro: Required element not found. \nClick to delete the macro.",
+        "description": "Tooltip when macro execution failed"
+    },
+    "badgeFailed": {
+        "message": "⨯", 
+        "description": "Badge text when macro execution failed"
+    },
+    "statusCompleted": {
+        "message": "SiteMacro successfullly executed a macro. \nClick to delete the macro.",
+        "description": "Tooltip when macro execution finished"
+    },
+    "badgeCompleted": {
+        "message": "✓",
+        "description": "Badge text when macro execution finished"
+    },
+    "statusRecording": {
+        "message": "SiteMacro is recording a macro. \nClick to cancel recording.",
+        "description": "Tooltip while recording the macro"
+    }, 
+    "badgeRecording": {
+        "message": "●", 
+        "description": "Badge text while recording the macro"
+    },
+
+    "stepChange": {
+        "message": "Change $ITEM$ to '$VALUE$'.", 
+        "description": "Step description for changed form fields",
+        "placeholders": { "item": {"content": "$2", "example": "element with name 'USERNAME'"}, "value": {"content": "$1", "example": "me@example.com"}}
+    }, 
+    "stepClick":  {
+        "message": "Click $ITEM$.", 
+        "description": "Step description for clicked elements",
+        "placeholders": { "item": {"content": "$1", "example": "element with text 'Login'"}}
+    },
+
+    "elemName": {
+        "message": "element with name '$NAME$' and path '$PATH$'",
+        "description": "Element description with path and name",
+        "placeholders": { "path": {"content": "$1", "example": "//div[4]"}, "name": {"content": "$2", "example": "USERNAME"}}
+    }, 
+    "elemText": {
+        "message": "element with text '$TEXT$' and path '$PATH$'",
+        "description": "Element description with path and text",
+        "placeholders": { "path": {"content": "$1", "example": "//div[4]"}, "text": {"content": "$2", "example": "Login"}}
+    }, 
+    "elemPath": {
+        "message": "element with path '$PATH$'",
+        "description": "Element description with path",
+        "placeholders": { "path": {"content": "$1", "example": "//div[4]"}}
+    },
+
+    "optionMacros": {
+        "message": "Existing Macros: ", 
+        "description": "Title for existing macro selection"
+    },
+    "optionPlaceholder": {
+        "message": "<< please select >>",
+        "description": "Dummy element in macro list"
+    },
+    "optionDelete": {
+        "message": "Delete", 
+        "description": "Button to delete selected macro"
+    }, 
+    
+    "pageRecording": {
+        "message": "SiteMacro: Recording...",
+        "description": "Text shown in page while recording"
+    },
+    "pageRecordOk": {
+        "message": "OK", 
+        "description": "Button to complete recording"
+    },
+    "pageRecordCancel": {
+        "message": "Cancel", 
+        "description": "Button to cancel recording"
+    }
+}
