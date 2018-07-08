@@ -1,0 +1,22 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "taskName": "Package",
+            "type": "shell",
+            "command": "web-ext build -a build --overwrite-dest",
+            "group": "build",
+            "problemMatcher": []
+        },
+
+        {
+            "taskName": "Debug in Firefox",
+            "type": "shell",
+            "command": "web-ext run",
+            "group": "build",
+            "problemMatcher": []
+        }
+    ]
+}
