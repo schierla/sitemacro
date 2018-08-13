@@ -41,24 +41,29 @@ var siteMacro = {
         chrome.browserAction.getBadgeText({tabId: tab.id}, text => {
             switch(text) {
             case chrome.i18n.getMessage("badgeRecording"):
-                chrome.tabs.sendMessage(tab.id, "cancel");
-                chrome.browserAction.setBadgeText({text: chrome.i18n.getMessage("badgeIdle"), tabId: tab.id});
-                chrome.browserAction.setTitle({title: chrome.i18n.getMessage("statusIdle"), tabId: tab.id });                
+                chrome.tabs.sendMessage(tab.id, "cancel", () => {
+                    if(chrome.runtime.lastError) return;
+                    chrome.browserAction.setBadgeText({text: chrome.i18n.getMessage("badgeIdle"), tabId: tab.id});
+                    chrome.browserAction.setTitle({title: chrome.i18n.getMessage("statusIdle"), tabId: tab.id });                
+                });
                 break;
             case chrome.i18n.getMessage("badgeActive"):
             case chrome.i18n.getMessage("badgeFailed") :
             case chrome.i18n.getMessage("badgeCompleted"):
             case chrome.i18n.getMessage("badgeThrottled"):
                 var key = "data/" + tab.url;
-                chrome.storage.local.remove(key);
                 delete siteMacro.database[key];
-                chrome.browserAction.setBadgeText({text: chrome.i18n.getMessage("badgeIdle"), tabId: tab.id});
-                chrome.browserAction.setTitle({title: chrome.i18n.getMessage("statusIdle"), tabId: tab.id });                
+                chrome.storage.local.remove(key, () => {
+                    chrome.browserAction.setBadgeText({text: chrome.i18n.getMessage("badgeIdle"), tabId: tab.id});
+                    chrome.browserAction.setTitle({title: chrome.i18n.getMessage("statusIdle"), tabId: tab.id });                
+                });
                 break;
             default:
-                chrome.tabs.executeScript(tab.id, {file: "/scripts/record.js"});
-                chrome.browserAction.setBadgeText({text: chrome.i18n.getMessage("badgeRecording"), tabId: tab.id});    
-                chrome.browserAction.setTitle({title: chrome.i18n.getMessage("statusRecording"), tabId: tab.id });
+                chrome.tabs.executeScript(tab.id, {file: "/scripts/record.js"}, () => {
+                    if(chrome.runtime.lastError) return;
+                    chrome.browserAction.setBadgeText({text: chrome.i18n.getMessage("badgeRecording"), tabId: tab.id});    
+                    chrome.browserAction.setTitle({title: chrome.i18n.getMessage("statusRecording"), tabId: tab.id });
+                });
                 break;
             }
         });
@@ -69,10 +74,11 @@ var siteMacro = {
             console.log("SiteMacro: Received steps for " + msg.url);
             var data = {}, key = "data/" + msg.url;
             data[key] = {steps: msg.steps, created: Date.now(), last: Date.now() - 15000};
-            chrome.storage.local.set(data, () => {});
             siteMacro.database[key] = data[key];
-            chrome.browserAction.setBadgeText({text: chrome.i18n.getMessage("badgeIdle"), tabId: sender.tab.id});
-            chrome.browserAction.setTitle({title: chrome.i18n.getMessage("statusIdle"), tabId: sender.tab.id });      
+            chrome.storage.local.set(data, () => {
+                chrome.browserAction.setBadgeText({text: chrome.i18n.getMessage("badgeRecorded"), tabId: sender.tab.id});
+                chrome.browserAction.setTitle({title: chrome.i18n.getMessage("statusRecorded"), tabId: sender.tab.id });          
+            });
         } else if(msg.command == "delete") {
             var key = "data/" + msg.url;
             chrome.storage.local.remove(key);

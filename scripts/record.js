@@ -82,7 +82,7 @@ var siteMacroRecord = {
         div.style.position="fixed"; div.style.left="0px"; div.style.width="100vw"; div.style.background="#700"; div.style.lineHeight="1.5em";
         div.style.textAlign="center"; div.style.zIndex=9999; div.style.color="#fff"; div.style.fontWeight="bold";
         div.appendChild(document.createTextNode(chrome.i18n.getMessage("pageRecording")));
-        div.style.transition="height 0.5s ease";
+        div.style.transition="height 0.3s ease";
         return div;
     },
 
@@ -93,6 +93,7 @@ var siteMacroRecord = {
 
         siteMacroRecord.counter = document.createElement("span");
         siteMacroRecord.div1.appendChild(siteMacroRecord.counter);
+        siteMacroRecord.counter.style.lineHeight = "1.7em";
 
         siteMacroRecord.ok = document.createElement("button"); 
         siteMacroRecord.ok.appendChild(document.createTextNode(chrome.i18n.getMessage("pageRecordOk")));
@@ -107,16 +108,18 @@ var siteMacroRecord = {
         siteMacroRecord.cancel.addEventListener("click", siteMacroRecord.abort);
 
         siteMacroRecord.div2 = siteMacroRecord.redDiv();
-        siteMacroRecord.div2.style.bottom="0px"; siteMacroRecord.div2.style.height="1.5em";
+        siteMacroRecord.div2.style.bottom="0px"; 
         document.body.appendChild(siteMacroRecord.div2);
 
-        setTimeout(() => {
-            siteMacroRecord.div1.style.height="1.5em"; 
-        }, 100);
         siteMacroRecord.paddingtop = document.body.style.paddingTop;
         siteMacroRecord.paddingbottom = document.body.style.paddingBottom;
-        document.body.style.paddingTop="1.5em";
-        document.body.style.paddingBottom="1.5em";
+        document.body.style.paddingTop="1.7em";
+        document.body.style.paddingBottom="1.7em";
+
+        setTimeout(() => {
+            siteMacroRecord.div1.style.height="1.7em"; 
+            siteMacroRecord.div2.style.height="1.7em";            
+        }, 50);
     }
 }
 

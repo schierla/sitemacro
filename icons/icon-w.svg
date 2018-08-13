@@ -28,17 +28,17 @@
      id="layer1"
      transform="translate(0,-233)">
     <path
-       style="display:inline;opacity:1;fill:#1a1a1a;fill-opacity:1;stroke:none;stroke-width:1.49336481;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="display:inline;opacity:1;fill:#e6e6e6;fill-opacity:1;stroke:none;stroke-width:1.49336481;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="M 121.04492 10.716797 A 110.8236 110.8236 0 0 0 66.078125 25.46875 L 231.85352 121.17969 A 110.8236 110.8236 0 0 0 121.04492 10.716797 z M 65.494141 25.802734 A 110.8236 110.8236 0 0 0 10.220703 121.54102 A 110.8236 110.8236 0 0 0 65.494141 217.31445 L 65.494141 25.802734 z M 231.85938 121.30664 L 65.529297 217.33594 A 110.8236 110.8236 0 0 0 121.04492 232.36328 A 110.8236 110.8236 0 0 0 231.86719 121.54102 A 110.8236 110.8236 0 0 0 231.85938 121.30664 z "
        transform="matrix(0.26458333,0,0,0.26458333,0,233)"
        id="path1381" />
     <g
        aria-label="✓"
-       style="font-style:normal;font-weight:normal;font-size:46.88454819px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;display:inline;fill:#1a1a1a;fill-opacity:1;stroke:none;stroke-width:1.17211378"
+       style="font-style:normal;font-weight:normal;font-size:46.88454819px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;display:inline;fill:#e6e6e6;fill-opacity:1;stroke:none;stroke-width:1.17211378"
        id="text1387">
       <path
          d="m 49.530565,250.62538 0.80125,1.16753 q -5.517176,4.18939 -11.354852,11.76692 -5.402711,7.09679 -8.676388,13.94175 -2.541106,1.67117 -4.532784,3.27367 -3.090534,-10.11863 -7.188353,-11.76692 2.312177,-2.63268 4.555676,-2.63268 1.922999,0 4.647248,6.43289 8.745067,-14.76588 21.748203,-22.18316 z"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';fill:#1a1a1a;stroke:none;stroke-width:1.17211378"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';fill:#e6e6e6;stroke:none;stroke-width:1.17211378;fill-opacity:1"
          id="path1414" />
     </g>
   </g>

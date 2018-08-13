@@ -9,7 +9,7 @@
     },
 
     "statusIdle": {
-        "message": "SiteMacro", 
+        "message": "SiteMacro is ready.\n\nClick to record a macro for this page.", 
         "description": "Default tooltip"
     },
     "badgeIdle": {
@@ -17,7 +17,7 @@
         "description": "Default Badge text"
     },
     "statusThrottled": {
-        "message": "SiteMacro did not execute a macro: Page repeated too quickly. \nClick to delete the macro.", 
+        "message": "SiteMacro did not execute a macro: \nPage repeated too quickly. \n\nClick to delete the macro.", 
         "description": "Tooltip when returning to page too quickly" 
     },
     "badgeThrottled": {
@@ -33,7 +33,7 @@
         "description": "Badge text while executing the macro"
     },
     "statusFailed": {
-        "message": "SiteMacro failed to execute a macro: Required element not found. \nClick to delete the macro.",
+        "message": "SiteMacro failed to execute a macro: \nRequired element not found. \n\nClick to delete the macro.",
         "description": "Tooltip when macro execution failed"
     },
     "badgeFailed": {
@@ -41,7 +41,7 @@
         "description": "Badge text when macro execution failed"
     },
     "statusCompleted": {
-        "message": "SiteMacro successfullly executed a macro. \nClick to delete the macro.",
+        "message": "SiteMacro successfullly executed a macro. \n\nClick to delete the macro.",
         "description": "Tooltip when macro execution finished"
     },
     "badgeCompleted": {
@@ -49,12 +49,20 @@
         "description": "Badge text when macro execution finished"
     },
     "statusRecording": {
-        "message": "SiteMacro is recording a macro. \nClick to cancel recording.",
+        "message": "SiteMacro is recording a macro. \n\nClick to cancel recording.",
         "description": "Tooltip while recording the macro"
     }, 
     "badgeRecording": {
         "message": "●", 
         "description": "Badge text while recording the macro"
+    },
+    "statusRecorded": {
+        "message": "SiteMacro successfully recorded a macro.",
+        "description": "Tooltip after recording the macro"
+    }, 
+    "badgeRecorded": {
+        "message": "◼", 
+        "description": "Badge text after recording the macro"
     },
 
     "stepChange": {
