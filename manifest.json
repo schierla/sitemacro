@@ -1,7 +1,7 @@
 {
 	"manifest_version": 2,
 	"name": "__MSG_extensionName__",
-	"version": "0.1",
+	"version": "0.2",
 	"description": "__MSG_extensionDescription__",
 	"default_locale": "en",
 	"icons": {
@@ -22,7 +22,7 @@
 			"16": "icons/icon-16.png",
 			"32": "icons/icon-32.png"
 		},
-		"default_title": "__MSG_statusIdle__", 
+		"default_title": "__MSG_extensionName__", 
 		"theme_icons": [
 			{"light": "icons/icon-w.svg", "dark": "icons/icon.svg", "size": 16},
 			{"light": "icons/icon-w.svg", "dark": "icons/icon.svg", "size": 32}
@@ -35,5 +35,5 @@
 	},
 	"options_ui": {
 		"page": "options.htm"
-	}
+	 }
 }
