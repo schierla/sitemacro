@@ -29,7 +29,7 @@
         "description": "Tooltip while executing the macro"
     },
     "badgeActive": {
-        "message": "►",
+        "message": "▶",
         "description": "Badge text while executing the macro"
     },
     "statusFailed": {
@@ -75,6 +75,11 @@
         "description": "Step description for clicked elements",
         "placeholders": { "item": {"content": "$1", "example": "element with text 'Login'"}}
     },
+    "stepWait":  {
+        "message": "Wait for $DURATION$ milliseconds", 
+        "description": "Step description for delays",
+        "placeholders": { "duration": {"content": "$1", "example": "1000"}}
+    },    
 
     "elemName": {
         "message": "element with name '$NAME$' and path '$PATH$'",
@@ -116,5 +121,13 @@
     "pageRecordCancel": {
         "message": "Cancel", 
         "description": "Button to cancel recording"
+    },
+    "pageRecordWait": {
+        "message": "Insert delay", 
+        "description": "Button to add a delay"
+    },
+    "pageRecordDuration": {
+        "message": "Duration (in milliseconds):", 
+        "description": "Query text for delay duration"
     }
 }

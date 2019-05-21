@@ -48,6 +48,8 @@ var selected = function() {
             li.appendChild(document.createTextNode(chrome.i18n.getMessage("stepClick", elemName(step))));
         } else if(step.type == "change") {
             li.appendChild(document.createTextNode(chrome.i18n.getMessage("stepChange", [step.value, elemName(step)])));
+        } else if(step.type == "wait") {
+            li.appendChild(document.createTextNode(chrome.i18n.getMessage("stepWait", [step.duration])));
         }
         _steps.appendChild(li);
     }

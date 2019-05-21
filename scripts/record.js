@@ -9,13 +9,13 @@ var siteMacroRecord = {
     paddingbottom: null,
 
     clicked: function(e) {
-        if(e.target == siteMacroRecord.ok || e.target == siteMacroRecord.cancel) return;
+        if(e.target == siteMacroRecord.ok || e.target == siteMacroRecord.cancel || e.target == siteMacroRecord.wait || e.target == siteMacroRecord.div1 || e.target == siteMacroRecord.div2) return;
         siteMacroRecord.steps.push(siteMacroRecord.fillTarget({type:"click" }, e.target));
         siteMacroRecord.counter.innerHTML += ".";
     }, 
 
     changed: function(e) {
-        if(e.target == siteMacroRecord.ok || e.target == siteMacroRecord.cancel) return;
+        if(e.target == siteMacroRecord.ok || e.target == siteMacroRecord.cancel || e.target == siteMacroRecord.wait || e.target == siteMacroRecord.div1 || e.target == siteMacroRecord.div2) return;
         siteMacroRecord.steps.push(siteMacroRecord.fillTarget({type:"change", value: e.target.value}, e.target));
         siteMacroRecord.counter.innerHTML += ".";
     }, 
@@ -26,6 +26,13 @@ var siteMacroRecord = {
         obj.target = siteMacroRecord.buildXPath(elem);
         return obj;
     },
+
+    addDelay: function(e) {
+        var duration = prompt(chrome.i18n.getMessage("pageRecordDuration"), "1000");
+        if(!duration) return;
+        siteMacroRecord.steps.push({type:"wait", duration:duration });
+        siteMacroRecord.counter.innerHTML += ".";
+    }, 
 
     unloaded: function(e) {
         siteMacroRecord.accept();
@@ -93,17 +100,17 @@ var siteMacroRecord = {
 
         siteMacroRecord.counter = document.createElement("span");
         siteMacroRecord.div1.appendChild(siteMacroRecord.counter);
-        siteMacroRecord.counter.style.lineHeight = "1.7em";
+        siteMacroRecord.counter.style.lineHeight = "1.7rem";
 
         siteMacroRecord.ok = document.createElement("button"); 
         siteMacroRecord.ok.appendChild(document.createTextNode(chrome.i18n.getMessage("pageRecordOk")));
-        siteMacroRecord.ok.style.float="right"; siteMacroRecord.ok.style.marginRight = "2em";
+        siteMacroRecord.ok.style.float="right"; siteMacroRecord.ok.style.marginRight = "2rem"; siteMacroRecord.ok.style.height="1.7rem";
         siteMacroRecord.div1.appendChild(siteMacroRecord.ok);
         siteMacroRecord.ok.addEventListener("click", siteMacroRecord.accept);
 
         siteMacroRecord.cancel = document.createElement("button"); 
         siteMacroRecord.cancel.appendChild(document.createTextNode(chrome.i18n.getMessage("pageRecordCancel")));
-        siteMacroRecord.cancel.style.float="right"; siteMacroRecord.cancel.style.marginRight = "0.5em";
+        siteMacroRecord.cancel.style.float="right"; siteMacroRecord.cancel.style.marginRight = "0.5rem"; siteMacroRecord.cancel.style.height="1.7rem";
         siteMacroRecord.div1.appendChild(siteMacroRecord.cancel);
         siteMacroRecord.cancel.addEventListener("click", siteMacroRecord.abort);
 
@@ -111,14 +118,20 @@ var siteMacroRecord = {
         siteMacroRecord.div2.style.bottom="0px"; 
         document.body.appendChild(siteMacroRecord.div2);
 
+        siteMacroRecord.wait = document.createElement("button"); 
+        siteMacroRecord.wait.appendChild(document.createTextNode(chrome.i18n.getMessage("pageRecordWait")));
+        siteMacroRecord.wait.style.float="right"; siteMacroRecord.wait.style.marginRight = "2rem"; siteMacroRecord.wait.style.height="1.7rem";
+        siteMacroRecord.div2.appendChild(siteMacroRecord.wait);
+        siteMacroRecord.wait.addEventListener("click", siteMacroRecord.addDelay);
+
         siteMacroRecord.paddingtop = document.body.style.paddingTop;
         siteMacroRecord.paddingbottom = document.body.style.paddingBottom;
-        document.body.style.paddingTop="1.7em";
-        document.body.style.paddingBottom="1.7em";
+        document.body.style.paddingTop="1.7rem";
+        document.body.style.paddingBottom="1.7rem";
 
         setTimeout(() => {
-            siteMacroRecord.div1.style.height="1.7em"; 
-            siteMacroRecord.div2.style.height="1.7em";            
+            siteMacroRecord.div1.style.height="1.7rem"; 
+            siteMacroRecord.div2.style.height="1.7rem";            
         }, 50);
     }
 }

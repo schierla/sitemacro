@@ -1,20 +1,37 @@
 var siteMacroReplay = {
     message: function(steps, sender, response) {
-        for(var i=0; i<steps.length; i++) {
-            var step = steps[i]; 
+        siteMacroReplay.execute(steps, response);
+        return true;
+    }, 
+    execute: function(steps, response) {
+        if(steps.length == 0) {
+            response(chrome.i18n.getMessage("badgeCompleted"));
+        } else {
+            var step = steps.shift();
             if(step.type == "click") {
-                var event = new MouseEvent('click', { view: window, bubbles: true, cancelable: true });
                 var elem = siteMacroReplay.elem(step.target);
-                if(!siteMacroReplay.checkElem(step, elem)) {console.log("SiteMacro: Failed at step " + i); response(chrome.i18n.getMessage("badgeFailed")); return; }
+                if(!siteMacroReplay.checkElem(step, elem)) {
+                    response(chrome.i18n.getMessage("badgeFailed")); 
+                    return; 
+                }
+                var event = new MouseEvent('click', { view: window, bubbles: true, cancelable: true });
                 elem.dispatchEvent(event);
             } else if(step.type == "change") {
                 var elem = siteMacroReplay.elem(step.target);
-                if(!siteMacroReplay.checkElem(step, elem)) {console.log("SiteMacro: Failed at step " + i); response(chrome.i18n.getMessage("badgeFailed")); return; }
+                if(!siteMacroReplay.checkElem(step, elem)) {
+                    response(chrome.i18n.getMessage("badgeFailed")); 
+                    return; 
+                }
                 elem.value = step.value;
+            } else if(step.type == "wait") {
+                setTimeout(() => {siteMacroReplay.execute(steps, response); }, step.duration);
+                return;
+            } else {
+                console.log("SiteMacro: Invalid step type " + step.type);
             }
+            setTimeout(() => {siteMacroReplay.execute(steps, response); }, 10);
         }
-        response(chrome.i18n.getMessage("badgeCompleted"));
-    }, 
+    },
     elem: function(xpath) {
         return document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
     }, 
