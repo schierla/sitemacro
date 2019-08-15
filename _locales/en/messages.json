@@ -109,6 +109,10 @@
         "message": "Delete", 
         "description": "Button to delete selected macro"
     }, 
+    "optionSave": {
+        "message": "Save", 
+        "description": "Button to save selected macro"
+    },     
     
     "pageRecording": {
         "message": "SiteMacro: Recording...",

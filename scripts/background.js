@@ -16,7 +16,15 @@ var siteMacro = {
     },
 
     tabUpdated: function(tabId, changeInfo, tab) {
-        var key = "data/" + tab.url;
+        if(changeInfo.status != "complete") return;
+        var url = tab.url;
+        if(siteMacro.database.prefix) {
+            for(var prefix in siteMacro.database.prefix) {
+                if(tab.url.startsWith(prefix)) url = siteMacro.database.prefix[prefix];
+            }
+        }
+
+        var key = "data/" + url;
         if(key in siteMacro.database) {
             var data = siteMacro.database[key];
             if(Date.now() - data.last < 10000) {
@@ -97,6 +105,14 @@ var siteMacro = {
             delete siteMacro.database[key];
         } else if(msg.command == "cancel") {   
             siteMacro.badgeAndTitle(sender.tab.id, chrome.i18n.getMessage("badgeIdle"), chrome.i18n.getMessage("statusIdle"));
+        } else if(msg.command == "addPrefix") {
+            if(!siteMacro.database.prefix) siteMacro.database.prefix = {};
+            siteMacro.database.prefix[msg.prefix] = msg.url;
+            chrome.storage.local.set({"prefix": siteMacro.database.prefix});
+        } else if(msg.command == "deletePrefix") {
+            if(!siteMacro.database.prefix) siteMacro.database.prefix = {};
+            delete siteMacro.database.prefix[msg.prefix];
+            chrome.storage.local.set({"prefix": siteMacro.database.prefix});
         }
     },
 
@@ -106,6 +122,9 @@ var siteMacro = {
             if(key.startsWith("data/")) {
                 origins.push(key.substr(5));
             }
+        }
+        if(siteMacro.database.prefix) for(var key in siteMacro.database.prefix) {
+            origins.push(key + "*");
         }
         chrome.permissions.contains({origins: origins}, result => {
             if(!result) chrome.tabs.create({url: chrome.runtime.getURL("permissions.htm")});

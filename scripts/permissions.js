@@ -17,6 +17,13 @@ function listPages() {
                 pages.appendChild(li);
             }
         }
+        if(data.prefix) {
+            for(var key in data.prefix) {
+                var li = document.createElement("li");
+                li.appendChild(document.createTextNode(key + "*"));
+                pages.appendChild(li);
+            }
+        }
         checkNextPage();
     });
 }
@@ -63,8 +70,12 @@ function remove() {
     var missing = document.getElementById("missing");
     var li = missing.firstChild;
     if(li) {
+        var url = li.firstChild.data;
         missing.removeChild(li);
-        chrome.runtime.sendMessage({command: "delete", url: li.firstChild.data}, remove);
+        if(url.endsWith("*")) 
+            chrome.runtime.sendMessage({command: "deletePrefix", prefix: url.substr(0, url.length - 1)}, remove);
+        else 
+            chrome.runtime.sendMessage({command: "delete", url: url}, remove);
     } else {
         listPages();
     }
