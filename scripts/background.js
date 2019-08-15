@@ -15,26 +15,25 @@ var siteMacro = {
         }
     },
 
-    loaded: function (e) {
-        if(e.frameId != 0) return;
-        var key = "data/" + e.url;
+    tabUpdated: function(tabId, changeInfo, tab) {
+        var key = "data/" + tab.url;
         if(key in siteMacro.database) {
             var data = siteMacro.database[key];
             if(Date.now() - data.last < 10000) {
-                siteMacro.badgeAndTitle(e.tabId, chrome.i18n.getMessage("badgeThrottled"), chrome.i18n.getMessage("statusThrottled"));
+                siteMacro.badgeAndTitle(tabId, chrome.i18n.getMessage("badgeThrottled"), chrome.i18n.getMessage("statusThrottled"));
                 return;
             } 
             
-            siteMacro.badgeAndTitle(e.tabId, chrome.i18n.getMessage("badgeActive"), chrome.i18n.getMessage("statusActive"));
+            siteMacro.badgeAndTitle(tabId, chrome.i18n.getMessage("badgeActive"), chrome.i18n.getMessage("statusActive"));
             
-            chrome.tabs.executeScript(e.tabId, {file: "/scripts/replay.js"}, () => {
-                chrome.tabs.sendMessage(e.tabId, data.steps, (resp) => {
+            chrome.tabs.executeScript(tabId, {file: "/scripts/replay.js"}, () => {
+                chrome.tabs.sendMessage(tabId, data.steps, (resp) => {
                     switch(resp) {
                     case chrome.i18n.getMessage("badgeFailed"):
-                        siteMacro.badgeAndTitle(e.tabId, resp, chrome.i18n.getMessage("statusFailed"));
+                        siteMacro.badgeAndTitle(tabId, resp, chrome.i18n.getMessage("statusFailed"));
                         break;
                     case chrome.i18n.getMessage("badgeCompleted"):
-                        siteMacro.badgeAndTitle(e.tabId, resp, chrome.i18n.getMessage("statusCompleted"));
+                        siteMacro.badgeAndTitle(tabId, resp, chrome.i18n.getMessage("statusCompleted"));
                         break;
                     }
                 });
@@ -43,9 +42,9 @@ var siteMacro = {
             siteMacro.database[key].last = Date.now();
             chrome.storage.local.set({key: siteMacro.database[key]});
         } else {
-            siteMacro.badgeAndTitle(e.tabId, chrome.i18n.getMessage("badgeIdle"), chrome.i18n.getMessage("statusIdle"));
+            siteMacro.badgeAndTitle(tabId, chrome.i18n.getMessage("badgeIdle"), chrome.i18n.getMessage("statusIdle"));
         }
-    }, 
+    },
 
     clicked: function(tab) {
         switch(siteMacro.status[tab.id]) {
@@ -114,7 +113,7 @@ var siteMacro = {
     },
 
     init: function() {
-        chrome.webNavigation.onDOMContentLoaded.addListener(siteMacro.loaded);
+        chrome.tabs.onUpdated.addListener(siteMacro.tabUpdated);
         chrome.browserAction.onClicked.addListener(siteMacro.clicked);
         chrome.runtime.onMessage.addListener(siteMacro.message);
         chrome.storage.local.get(null, data => { siteMacro.database = data; siteMacro.checkPermissions(); });

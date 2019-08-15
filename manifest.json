@@ -12,8 +12,8 @@
 		"96": "icons/icon-96.png"
 	},
 	"permissions": [
-		"webNavigation",
 		"activeTab",
+		"tabs",
 		"storage"
 	],
 	"optional_permissions": [
