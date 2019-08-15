@@ -85,8 +85,8 @@ var siteMacroRecord = {
     }, 
     
     redDiv: function() {
-        var div = document.createElement("div");
-        div.style.position="fixed"; div.style.left="0px"; div.style.width="100vw"; div.style.background="#700"; div.style.lineHeight="1.5em";
+        var div = document.createElement("div0");
+        div.style.display="block"; div.style.position="fixed"; div.style.left="0px"; div.style.width="100vw"; div.style.background="#700"; div.style.lineHeight="1.5rem"; div.style.fontSize="1rem";
         div.style.textAlign="center"; div.style.zIndex=9999; div.style.color="#fff"; div.style.fontWeight="bold";
         div.appendChild(document.createTextNode(chrome.i18n.getMessage("pageRecording")));
         div.style.transition="height 0.3s ease";

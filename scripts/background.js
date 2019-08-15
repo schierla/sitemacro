@@ -65,6 +65,15 @@ var siteMacro = {
             });
             break;
         default:
+            chrome.permissions.request({origins: [new URL(tab.url).origin + "/"]}, granted => {
+                if(!granted) {
+                    chrome.tabs.sendMessage(tab.id, "cancel", () => {
+                        siteMacro.badgeAndTitle(tab.id, chrome.i18n.getMessage("badgeIdle"), chrome.i18n.getMessage("statusIdle"));
+                        if(chrome.runtime.lastError) return;
+                    });
+                }
+            });
+      
             chrome.tabs.executeScript(tab.id, {file: "/scripts/record.js"}, () => {
                 if(chrome.runtime.lastError) return;
                 siteMacro.badgeAndTitle(tab.id, chrome.i18n.getMessage("badgeRecording"), chrome.i18n.getMessage("statusRecording"));         
@@ -91,11 +100,23 @@ var siteMacro = {
         }
     },
 
+    checkPermissions: function() {
+        var origins = [];
+        if(siteMacro.database) for(var key in siteMacro.database) {
+            if(key.startsWith("data/")) {
+                origins.push(new URL(key.substr(5)).origin + "/");
+            }
+        }
+        chrome.permissions.contains({origins: origins}, result => {
+            if(!result) chrome.tabs.create({url: chrome.runtime.getURL("permissions.htm")});
+        });
+    },
+
     init: function() {
         chrome.webNavigation.onDOMContentLoaded.addListener(siteMacro.loaded);
         chrome.browserAction.onClicked.addListener(siteMacro.clicked);
         chrome.runtime.onMessage.addListener(siteMacro.message);
-        chrome.storage.local.get(null, data => { siteMacro.database = data; });
+        chrome.storage.local.get(null, data => { siteMacro.database = data; siteMacro.checkPermissions(); });
     }
 };
 
