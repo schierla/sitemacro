@@ -38,7 +38,7 @@ function checkNextPage() {
         }
         return;
     }
-    chrome.permissions.contains({ origins: [ new URL(li.firstChild.data).origin  + "/"] }, ok => {
+    chrome.permissions.contains({ origins: [ li.firstChild.data ] }, ok => {
         if (ok) granted.appendChild(li);
         else missing.appendChild(li);
         checkNextPage();
@@ -50,7 +50,7 @@ function grant() {
     var li = missing.firstChild;
     var origins = [];
     while (li) {
-        origins.push(new URL(li.firstChild.data).origin + "/");
+        origins.push(li.firstChild.data);
         li = li.nextSibling;
     }
 

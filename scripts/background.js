@@ -16,6 +16,7 @@ var siteMacro = {
     },
 
     loaded: function (e) {
+        if(e.frameId != 0) return;
         var key = "data/" + e.url;
         if(key in siteMacro.database) {
             var data = siteMacro.database[key];
@@ -65,7 +66,7 @@ var siteMacro = {
             });
             break;
         default:
-            chrome.permissions.request({origins: [new URL(tab.url).origin + "/"]}, granted => {
+            chrome.permissions.request({origins: [tab.url]}, granted => {
                 if(!granted) {
                     chrome.tabs.sendMessage(tab.id, "cancel", () => {
                         siteMacro.badgeAndTitle(tab.id, chrome.i18n.getMessage("badgeIdle"), chrome.i18n.getMessage("statusIdle"));
@@ -104,7 +105,7 @@ var siteMacro = {
         var origins = [];
         if(siteMacro.database) for(var key in siteMacro.database) {
             if(key.startsWith("data/")) {
-                origins.push(new URL(key.substr(5)).origin + "/");
+                origins.push(key.substr(5));
             }
         }
         chrome.permissions.contains({origins: origins}, result => {
