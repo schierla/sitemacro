@@ -51,3 +51,4 @@ var siteMacroReplay = {
 }
 
 chrome.runtime.onMessage.addListener(siteMacroReplay.message);
+chrome.runtime.sendMessage({command: "replay"});

@@ -13,7 +13,6 @@
 	},
 	"permissions": [
 		"activeTab",
-		"tabs",
 		"storage"
 	],
 	"optional_permissions": [
