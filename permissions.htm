@@ -3,53 +3,31 @@
 
 <head>
     <meta charset="utf-8" />
-    <script src="scripts/permissions.js"></script>
-    <style>
-        body {
-            font-family: sans-serif;
-            max-width: 50em;
-            margin-left: auto;
-            margin-right: auto;
-            padding: 1em;
-        }
-
-        img {
-            margin-top: 2em;
-            float: right;
-        }
-
-        button {
-            margin-right: 1em;
-            padding: 1em;
-            width: 40%;
-        }
-
-    </style>
+    <link rel="stylesheet" href="styles/permissions.css">
 </head>
 
 <body>
     <img src="icons/icon-48.png" alt="">
-    <h1>To execute macros, SiteMacro requires permission to access these pages.</h1>
-    <p>
+    <h1 id="permissionTitle"></h1>
+    <div>
         <ul id="pages"></ul>
-    </p>
-    <p id="anygranted">
-        Allowed Pages:
+    </div>
+    <div id="anygranted">
+        <span id="permissionAllowed"></span>
         <ul id="granted"></ul>
-    </p>
-    <p id="anymissing">
-        Missing Pages:
+    </div>
+    <div id="anymissing">
+        <span id="permissionMissing"></span>
         <ul id="missing"></ul>
-    </p>
+    </div>
 
-    <p id="todo">
-        <button id="grant">Grant Permission</button>
-        <button id="remove">Remove Macros</button>
-    </p>
+    <div id="todo">
+        <button id="grant"></button>
+        <button id="remove"></button>
+    </div>
 
-    <h2 id="done">
-        ✓ Thank you, all required permissions have been granted.
-    </h2>
+    <h2 id="done"></h2>
+    <script src="scripts/permissions.js"></script>
 </body>
 
 </html>

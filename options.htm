@@ -3,23 +3,25 @@
 
 <head>
     <meta charset="utf-8" />
+    <link rel="stylesheet" href="styles/options.css">
 </head>
 
 <body>
-    <div id="macros"></div>
     <select id="pages" style="width: 100%"></select>
     <div id="details">
         <ol id="steps"></ol>
 
-        <div>Apply to
+        <div id="apply"><label id="applyTo" for="type"></label>
             <select id="type">
-                <option value="exact">exact URL</option>
-                <option value="prefix">URLs starting with:</option>
+                <option value="exact" id="optionExact"></option>
+                <option value="prefix" id="optionPrefix"></option>
             </select>
             <input type="text" id="prefix">
         </div>
 
-        <button id="save"></button> <button id="delete"></button> 
+        <div id="buttons">
+            <button id="delete"></button> <button id="save"></button>
+        </div>
     </div>
 
     <script src="scripts/options.js"></script>

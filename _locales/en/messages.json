@@ -97,12 +97,8 @@
         "placeholders": { "path": {"content": "$1", "example": "//div[4]"}}
     },
 
-    "optionMacros": {
-        "message": "Existing Macros: ", 
-        "description": "Title for existing macro selection"
-    },
     "optionPlaceholder": {
-        "message": "<< please select >>",
+        "message": "<< please select an existing macro >>",
         "description": "Dummy element in macro list"
     },
     "optionDelete": {
@@ -112,7 +108,44 @@
     "optionSave": {
         "message": "Save", 
         "description": "Button to save selected macro"
-    },     
+    },
+    "optionApplyTo": {
+        "message": "Apply to ", 
+        "description": "Label for the selection box for prefix and exact match"
+    },
+    "optionExact": {
+        "message": "exact URL", 
+        "description": "Option to apply macro only to exactly this page"
+    },
+    "optionPrefix": {
+        "message": "URLs starting with:", 
+        "description": "Option to apply macro to all pages starting with the given URL"
+    },
+    
+    "permissionTitle": {
+        "message": "To execute macros, SiteMacro requires permission to access these pages.", 
+        "description": "Title for the permission page"
+    },
+    "permissionAllowed": {
+        "message": "Allowed Pages:", 
+        "description": "List headline for allowed pages"
+    },
+    "permissionMissing": {
+        "message": "Missing Pages:", 
+        "description": "List headline for pages with missing permission"
+    },
+    "permissionGrant": {
+        "message": "Grant Permission", 
+        "description": "Button to grant permission"
+    },
+    "permissionRemove": {
+        "message": "Remove Macros", 
+        "description": "Button to remove macros"
+    },
+    "permissionDone": {
+        "message": "✓ Thank you, all required permissions have been granted.", 
+        "description": "Text that all required permissions have been granted"
+    },
     
     "pageRecording": {
         "message": "SiteMacro: Recording...",

@@ -1,22 +1,23 @@
 var database = {};
 var _pages = document.getElementById("pages");
 var _steps = document.getElementById("steps");
-var _macros = document.getElementById("macros");
 var _delete = document.getElementById("delete");
 var _save = document.getElementById("save");
 var _details = document.getElementById("details");
 var _type = document.getElementById("type");
 var _prefix = document.getElementById("prefix");
 
-_macros.appendChild(document.createTextNode(chrome.i18n.getMessage("optionMacros")));
 _delete.appendChild(document.createTextNode(chrome.i18n.getMessage("optionDelete")));
 _save.appendChild(document.createTextNode(chrome.i18n.getMessage("optionSave")));
+document.getElementById("applyTo").appendChild(document.createTextNode(chrome.i18n.getMessage("optionApplyTo")));
+document.getElementById("optionExact").appendChild(document.createTextNode(chrome.i18n.getMessage("optionExact")));
+document.getElementById("optionPrefix").appendChild(document.createTextNode(chrome.i18n.getMessage("optionPrefix")));
 
 var reload = function() {
     chrome.storage.local.get(null, data => { 
         database = data;
         while(_pages.firstChild) _pages.removeChild(_pages.firstChild);
-        var option = document.createElement("option"); option.appendChild(document.createTextNode("<< please select >>"));
+        var option = document.createElement("option"); option.appendChild(document.createTextNode(chrome.i18n.getMessage("optionPlaceholder")));
         _pages.appendChild(option);
         for(var key in data) {
             if(key.startsWith("data/")) {

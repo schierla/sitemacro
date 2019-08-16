@@ -1,0 +1,11 @@
+body {padding: 5px; min-height: 30em; }
+
+#steps {overflow-y: auto; height: 20em; }
+
+#apply {display: flex; align-items: baseline; }
+#apply select, #apply label {flex: 0 0 auto; }
+#apply select {margin: 0 5px; }
+#apply #prefix { flex-grow: 1; }
+
+#buttons {text-align: right; margin: 5px 0; }
+#buttons button { padding: 3px; width: 10em; text-align: center; }
