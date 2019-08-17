@@ -4,7 +4,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "taskName": "Package",
+            "label": "Package",
             "type": "shell",
             "command": "web-ext build -a build --overwrite-dest",
             "group": "build",
@@ -12,7 +12,7 @@
         },
 
         {
-            "taskName": "Debug in Firefox",
+            "label": "Debug in Firefox",
             "type": "shell",
             "command": "web-ext run",
             "group": "build",
