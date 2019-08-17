@@ -183,7 +183,7 @@ var siteMacro = {
 
     registerContentScript: function(url) {
         if(chrome.contentScripts) 
-            chrome.contentScripts.register({js: [{file: 'scripts/replay.js' }], matches: [ url ]});
+            chrome.contentScripts.register({js: [{file: 'scripts/replay.js' }], matches: [ url.replace(/#.*$/, "") ]});
     },
 
     init: function() {
