@@ -1,21 +1,26 @@
 var siteMacroRecord = {
     steps: [], 
     counter: null,
-    div1: null, 
-    div2: null,
-    ok: null, 
-    cancel: null,
+    root: null,
     paddingtop: null,
     paddingbottom: null,
 
+    isSiteMacroUi: function(e) {
+        while(e) {
+            if(e == siteMacroRecord.root) return true;
+            e = e.parentNode;
+        }
+        return false;
+    },
+
     clicked: function(e) {
-        if(e.target == siteMacroRecord.ok || e.target == siteMacroRecord.cancel || e.target == siteMacroRecord.wait || e.target == siteMacroRecord.div1 || e.target == siteMacroRecord.div2) return;
+        if(siteMacroRecord.isSiteMacroUi(e.target)) return;
         siteMacroRecord.steps.push(siteMacroRecord.fillTarget({type:"click" }, e.target));
         siteMacroRecord.counter.innerHTML += ".";
     }, 
 
     changed: function(e) {
-        if(e.target == siteMacroRecord.ok || e.target == siteMacroRecord.cancel || e.target == siteMacroRecord.wait || e.target == siteMacroRecord.div1 || e.target == siteMacroRecord.div2) return;
+        if(siteMacroRecord.isSiteMacroUi(e.target)) return;
         siteMacroRecord.steps.push(siteMacroRecord.fillTarget({type:"change", value: e.target.value}, e.target));
         siteMacroRecord.counter.innerHTML += ".";
     }, 
@@ -33,6 +38,14 @@ var siteMacroRecord = {
         siteMacroRecord.steps.push({type:"wait", duration:duration });
         siteMacroRecord.counter.innerHTML += ".";
     }, 
+
+    addCloseTab: function(e) {
+        siteMacroRecord.steps.push({type:"close" });
+        siteMacroRecord.counter.innerHTML += ".";
+        siteMacroRecord.accept();
+        chrome.runtime.sendMessage({command: "closeTab"});
+    }, 
+
 
     unloaded: function(e) {
         siteMacroRecord.accept();
@@ -59,8 +72,7 @@ var siteMacroRecord = {
         window.removeEventListener("change", siteMacroRecord.changed, true);
         window.removeEventListener("unload", siteMacroRecord.unloaded);
         chrome.runtime.onMessage.removeListener(siteMacroRecord.message);        
-        document.body.removeChild(siteMacroRecord.div1);
-        document.body.removeChild(siteMacroRecord.div2);
+        document.body.removeChild(siteMacroRecord.root);
         document.body.style.paddingTop=siteMacroRecord.paddingtop;
         document.body.style.paddingBottom=siteMacroRecord.paddingbottom;
     },
@@ -94,44 +106,66 @@ var siteMacroRecord = {
     },
 
     showRecording: function() {
-        siteMacroRecord.div1 = siteMacroRecord.redDiv();
-        siteMacroRecord.div1.style.top="0px"; siteMacroRecord.div1.style.height="100vh";
-        document.body.appendChild(siteMacroRecord.div1);
+        var div1 = siteMacroRecord.redDiv();
+        div1.style.top="0px"; div1.style.height="100vh";
 
-        siteMacroRecord.counter = document.createElement("span");
-        siteMacroRecord.div1.appendChild(siteMacroRecord.counter);
-        siteMacroRecord.counter.style.lineHeight = "1.7rem";
+        var counter = document.createElement("span");
+        div1.appendChild(counter);
+        counter.style.lineHeight = "1.7rem";
 
-        siteMacroRecord.ok = document.createElement("button"); 
-        siteMacroRecord.ok.appendChild(document.createTextNode(chrome.i18n.getMessage("pageRecordOk")));
-        siteMacroRecord.ok.style.float="right"; siteMacroRecord.ok.style.marginRight = "2rem"; siteMacroRecord.ok.style.height="1.7rem";
-        siteMacroRecord.div1.appendChild(siteMacroRecord.ok);
-        siteMacroRecord.ok.addEventListener("click", siteMacroRecord.accept);
+        var ok = document.createElement("button"); 
+        ok.appendChild(document.createTextNode(chrome.i18n.getMessage("pageRecordOk")));
+        ok.style.float="right"; ok.style.marginRight = "2rem"; ok.style.height="1.7rem";
+        div1.appendChild(ok);
+        ok.addEventListener("click", siteMacroRecord.accept);
 
-        siteMacroRecord.cancel = document.createElement("button"); 
-        siteMacroRecord.cancel.appendChild(document.createTextNode(chrome.i18n.getMessage("pageRecordCancel")));
-        siteMacroRecord.cancel.style.float="right"; siteMacroRecord.cancel.style.marginRight = "0.5rem"; siteMacroRecord.cancel.style.height="1.7rem";
-        siteMacroRecord.div1.appendChild(siteMacroRecord.cancel);
-        siteMacroRecord.cancel.addEventListener("click", siteMacroRecord.abort);
+        var cancel = document.createElement("button"); 
+        cancel.appendChild(document.createTextNode(chrome.i18n.getMessage("pageRecordCancel")));
+        cancel.style.float="right"; cancel.style.marginRight = "0.5rem"; cancel.style.height="1.7rem";
+        div1.appendChild(cancel);
+        cancel.addEventListener("click", siteMacroRecord.abort);
 
-        siteMacroRecord.div2 = siteMacroRecord.redDiv();
-        siteMacroRecord.div2.style.bottom="0px"; 
-        document.body.appendChild(siteMacroRecord.div2);
+        var div2 = siteMacroRecord.redDiv();
+        div2.style.bottom="0px"; 
 
-        siteMacroRecord.wait = document.createElement("button"); 
-        siteMacroRecord.wait.appendChild(document.createTextNode(chrome.i18n.getMessage("pageRecordWait")));
-        siteMacroRecord.wait.style.float="right"; siteMacroRecord.wait.style.marginRight = "2rem"; siteMacroRecord.wait.style.height="1.7rem";
-        siteMacroRecord.div2.appendChild(siteMacroRecord.wait);
-        siteMacroRecord.wait.addEventListener("click", siteMacroRecord.addDelay);
+        var actions = document.createElement("select");
+        actions.style.float="right"; actions.style.marginRight = "2rem"; actions.style.height="1.7rem";
+        div2.appendChild(actions);
 
+        var addaction = document.createElement("option"); addaction.value="actions";
+        addaction.appendChild(document.createTextNode(chrome.i18n.getMessage("pageRecordAddStep")));
+        actions.appendChild(addaction);
+
+        var wait = document.createElement("option"); wait.value="wait";
+        wait.appendChild(document.createTextNode(chrome.i18n.getMessage("pageRecordWait")));
+        actions.appendChild(wait);
+
+        var closetab = document.createElement("option"); closetab.value = "closetab";
+        closetab.appendChild(document.createTextNode(chrome.i18n.getMessage("pageRecordCloseTab")));
+        actions.appendChild(closetab);
+
+        actions.addEventListener("change", function(e) {
+            if(actions.value == "closetab") siteMacroRecord.addCloseTab();
+            else if(actions.value == "wait") siteMacroRecord.addDelay();
+            actions.value = "actions";
+        });
+        actions.value = "actions";
+
+        var root = document.createElement("sitemacroroot");
+        root.appendChild(div1);
+        root.appendChild(div2);
+        siteMacroRecord.counter = counter;
+        siteMacroRecord.root = root;
+
+        document.body.appendChild(root);
         siteMacroRecord.paddingtop = document.body.style.paddingTop;
         siteMacroRecord.paddingbottom = document.body.style.paddingBottom;
         document.body.style.paddingTop="1.7rem";
         document.body.style.paddingBottom="1.7rem";
 
         setTimeout(() => {
-            siteMacroRecord.div1.style.height="1.7rem"; 
-            siteMacroRecord.div2.style.height="1.7rem";            
+            div1.style.height="1.7rem"; 
+            div2.style.height="1.7rem";            
         }, 50);
     }
 }

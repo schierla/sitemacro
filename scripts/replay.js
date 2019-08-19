@@ -26,6 +26,9 @@ var siteMacroReplay = {
             } else if(step.type == "wait") {
                 setTimeout(() => {siteMacroReplay.execute(steps, response); }, step.duration);
                 return;
+            } else if(step.type == "close") {
+                response(chrome.i18n.getMessage("badgeCompleted"));
+                chrome.runtime.sendMessage({command: "closeTab"});
             } else {
                 console.log("SiteMacro: Invalid step type " + step.type);
             }

@@ -56,6 +56,8 @@ var selected = function() {
             li.appendChild(document.createTextNode(chrome.i18n.getMessage("stepChange", [step.value, elemName(step)])));
         } else if(step.type == "wait") {
             li.appendChild(document.createTextNode(chrome.i18n.getMessage("stepWait", [step.duration])));
+        } else if(step.type == "close") {
+            li.appendChild(document.createTextNode(chrome.i18n.getMessage("stepClose")));
         }
         _steps.appendChild(li);
     }

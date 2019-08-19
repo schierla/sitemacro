@@ -79,6 +79,10 @@
         "message": "Wait for $DURATION$ milliseconds", 
         "description": "Step description for delays",
         "placeholders": { "duration": {"content": "$1", "example": "1000"}}
+    }, 
+    "stepClose":  {
+        "message": "Close the tab", 
+        "description": "Step description for close"
     },    
 
     "elemName": {
@@ -158,6 +162,14 @@
     "pageRecordCancel": {
         "message": "Cancel", 
         "description": "Button to cancel recording"
+    },
+    "pageRecordAddStep": {
+        "message": "add step...", 
+        "description": "Drop down to add special steps"
+    },
+    "pageRecordCloseTab": {
+        "message": "Close tab", 
+        "description": "Button to close the current tab"
     },
     "pageRecordWait": {
         "message": "Insert delay", 

@@ -74,6 +74,8 @@ var siteMacro = {
             siteMacro.createPrefix(msg.prefix, msg.url);
         } else if(msg.command == "deletePrefix") {
             siteMacro.deletePrefix(msg.prefix);
+        } else if(msg.command == "closeTab") {
+            chrome.tabs.remove(sender.tab.id);
         }
     },
 
