@@ -8,4 +8,6 @@ body {padding: 5px; min-height: 30em; }
 #apply #prefix { flex-grow: 1; }
 
 #buttons {text-align: right; margin: 5px 0; }
-#buttons button { padding: 3px; width: 10em; text-align: center; }
+#buttons button { padding: 1px; width: 8em; text-align: center; }
+#file {display: none; }
+#status {margin: 5px 0;}

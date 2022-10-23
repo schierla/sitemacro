@@ -109,6 +109,14 @@
         "message": "Delete", 
         "description": "Button to delete selected macro"
     }, 
+    "optionExport": {
+        "message": "Export", 
+        "description": "Button to export selected macro to file"
+    }, 
+    "optionImport": {
+        "message": "Import", 
+        "description": "Button to import macro from file"
+    }, 
     "optionSave": {
         "message": "Save", 
         "description": "Button to save selected macro"

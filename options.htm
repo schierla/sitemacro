@@ -1,30 +1,33 @@
 <!DOCTYPE html>
 <html>
-
-<head>
+  <head>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="styles/options.css">
-</head>
+    <link rel="stylesheet" href="styles/options.css" />
+  </head>
 
-<body>
+  <body>
     <select id="pages" style="width: 100%"></select>
+    <ol id="steps"></ol>
     <div id="details">
-        <ol id="steps"></ol>
+      <div id="apply">
+        <label id="applyTo" for="type"></label>
+        <select id="type">
+          <option value="exact" id="optionExact"></option>
+          <option value="prefix" id="optionPrefix"></option>
+        </select>
+        <input type="text" id="prefix" />
+      </div>
 
-        <div id="apply"><label id="applyTo" for="type"></label>
-            <select id="type">
-                <option value="exact" id="optionExact"></option>
-                <option value="prefix" id="optionPrefix"></option>
-            </select>
-            <input type="text" id="prefix">
-        </div>
-
-        <div id="buttons">
-            <button id="delete"></button> <button id="save"></button>
-        </div>
+      <div id="buttons">
+        <button id="export"></button>
+        <button id="delete"></button>
+        <button id="save"></button>
+      </div>
     </div>
 
+    <input type="file" id="file"></input>
+    <button id="import"></button>
+    <div id="status"></div>
     <script src="scripts/options.js"></script>
-</body>
-
+  </body>
 </html>
