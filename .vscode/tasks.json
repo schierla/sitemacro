@@ -6,7 +6,7 @@
     {
       "label": "Package",
       "type": "shell",
-      "command": "yarn web-ext build -a build --overwrite-dest",
+      "command": "yarn web-ext build -a build --overwrite-dest -i yarn.lock",
       "group": "build",
       "problemMatcher": []
     },
