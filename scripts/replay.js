@@ -1,5 +1,8 @@
 var siteMacroReplay = {
+    started: false,
     message: function(steps, sender, response) {
+        if(siteMacroReplay.started) return false;
+        siteMacroReplay.started = true;
         siteMacroReplay.execute(steps, response);
         return true;
     }, 

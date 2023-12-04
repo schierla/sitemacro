@@ -172,6 +172,6 @@ var siteMacroRecord = {
 
 window.addEventListener("click", siteMacroRecord.clicked, true);
 window.addEventListener("change", siteMacroRecord.changed, true);
-window.addEventListener("unload", siteMacroRecord.unloaded);
+window.addEventListener("beforeunload", siteMacroRecord.unloaded);
 siteMacroRecord.showRecording();
 chrome.runtime.onMessage.addListener(siteMacroRecord.message);
