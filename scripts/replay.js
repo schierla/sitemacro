@@ -45,10 +45,10 @@ var siteMacroReplay = {
         if(elem == null) { 
             console.log("SiteMacro: Did not find element with path " + obj.target); 
             return false; 
-        } else if(obj.name && elem.name != obj.name) {
+        } else if(obj.name && elem.name?.trim() != obj.name.trim()) {
             console.log("SiteMacro: Element with path " + obj.target + " has name '" + elem.name + "' instead of '" + obj.name + "'"); 
             return false;
-        } else if(obj.text && elem.innerText != obj.text) {
+        } else if(obj.text && elem.innerText?.trim() != obj.text.trim()) {
             console.log("SiteMacro: Element with path " + obj.target + " has text '" + elem.innerText + "' instead of '" + obj.text + "'"); 
             return false; 
         }
