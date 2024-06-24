@@ -1,6 +1,6 @@
 {
   "name": "sitemacro",
   "devDependencies": {
-    "web-ext": "^7.6.1"
+    "web-ext": "^8.2.0"
   }
 }
