@@ -3,55 +3,69 @@
 var siteMacro = {
   database: {},
   status: {},
+  connections: {},
 
-  badgeAndTitle: function (tabId, badge, title) {
-    siteMacro.status[tabId] = badge;
+  setBadgeAndStatus: function (tabId, status, badge) {
+    siteMacro.status[tabId] = status;
+    if (tabId in siteMacro.connections) {
+      for (const port of siteMacro.connections[tabId]) {
+        port.postMessage(status);
+      }
+    }
     if (chrome.action) {
       chrome.action.setBadgeText({ text: badge, tabId: tabId });
-      chrome.action.setTitle({ title: title, tabId: tabId });
     } else if (chrome.browserAction.setBadgeText) {
       chrome.browserAction.setBadgeText({ text: badge, tabId: tabId });
-      chrome.browserAction.setTitle({ title: title, tabId: tabId });
-    } else {
-      chrome.browserAction.setTitle({
-        title:
-          (badge != null ? badge + " " : "") +
-          chrome.i18n.getMessage("extensionName"),
-        tabId: tabId,
-      });
     }
   },
 
   setTabStatus: function (tabId, status) {
-    siteMacro.badgeAndTitle(
+    siteMacro.setBadgeAndStatus(
       tabId,
-      chrome.i18n.getMessage("badge" + status),
-      chrome.i18n.getMessage("status" + status)
+      status,
+      chrome.i18n.getMessage("badge" + status)
     );
+  },
+
+  injectReplayScript: function (tabId, callback) {
+    if (chrome.scripting) {
+      chrome.scripting.executeScript(
+        {
+          target: { tabId },
+          files: ["/scripts/replay.js"],
+        },
+        callback
+      );
+    } else {
+      chrome.tabs.executeScript(
+        tabId,
+        { file: "/scripts/replay.js" },
+        callback
+      );
+    }
   },
 
   tabUpdated: function (tabId, changeInfo, tab) {
     if (changeInfo.status != "complete") return;
-    if (!tab.url) return;
+    if (!tab.url) {
+      siteMacro.setTabStatus(tabId, "Idle");
+      return;
+    }
     if (siteMacro.getKey(tab.url)) {
-      if (chrome.scripting) {
-        chrome.scripting.executeScript({
-          target: { tabId },
-          files: ["/scripts/replay.js"],
-        });
-      } else {
-        chrome.tabs.executeScript(
-          tabId,
-          { file: "/scripts/replay.js" },
-          () => {}
-        );
-      }
+      siteMacro.injectReplayScript(tabId, () => {
+        siteMacro.replayMacro(tab.url, tab.id, false);
+      });
     } else {
       siteMacro.setTabStatus(tabId, "Idle");
     }
   },
 
   getKey: function (url) {
+    var key = "data/" + url;
+    if (key in siteMacro.database) {
+      return key;
+    }
+
     if (siteMacro.database.prefix) {
       for (var prefix in siteMacro.database.prefix) {
         if (url.startsWith(prefix)) url = siteMacro.database.prefix[prefix];
@@ -65,32 +79,13 @@ var siteMacro = {
     return null;
   },
 
-  clicked: function (tab) {
-    switch (siteMacro.status[tab.id]) {
-      case chrome.i18n.getMessage("badgeRecording"):
-        siteMacro.cancelMacro(tab.id);
-        break;
-      case chrome.i18n.getMessage("badgeActive"):
-      case chrome.i18n.getMessage("badgeFailed"):
-      case chrome.i18n.getMessage("badgeCompleted"):
-      case chrome.i18n.getMessage("badgeThrottled"):
-        siteMacro.deleteMacro(tab.url);
-        siteMacro.setTabStatus(tab.id, "Idle");
-        break;
-      default:
-        siteMacro.recordMacro(tab.url, tab.id);
-        break;
-    }
-  },
-
-  message: function (msg, sender) {
-    if (msg.command == "replay") {
-      siteMacro.replayMacro(sender.url, sender.tab.id);
-    } else if (msg.command == "add") {
+  message: function (msg, sender, callback) {
+    if (msg.command == "add") {
       siteMacro.createMacro(msg.url, msg.steps);
       siteMacro.setTabStatus(sender.tab.id, "Recorded");
     } else if (msg.command == "delete") {
       siteMacro.deleteMacro(msg.url);
+      if (msg.tabId) siteMacro.setTabStatus(msg.tabId, "Idle");
     } else if (msg.command == "cancel") {
       siteMacro.cancelMacro(sender.tab.id);
     } else if (msg.command == "addPrefix") {
@@ -99,14 +94,37 @@ var siteMacro = {
       siteMacro.deletePrefix(msg.prefix);
     } else if (msg.command == "closeTab") {
       chrome.tabs.remove(sender.tab.id);
+    } else if (msg.command == "record") {
+      siteMacro.recordMacro(msg.url, msg.tabId);
+    } else if ((msg.command = "execute")) {
+      siteMacro.injectReplayScript(msg.tabId, () => {
+        siteMacro.replayMacro(msg.url, msg.tabId, true);
+      });
     }
   },
 
-  replayMacro: function (url, tabId) {
+  connect: function (port) {
+    port.onMessage.addListener((message) => {
+      if (!(message.tabId in siteMacro.connections)) {
+        siteMacro.connections[message.tabId] = [];
+      }
+      siteMacro.connections[message.tabId].push(port);
+      port.postMessage(siteMacro.status[message.tabId] ?? "Idle");
+      port.onDisconnect.addListener(() => {
+        siteMacro.connections[message.tabId].splice(
+          siteMacro.connections[message.tabId].indexOf(port),
+          1
+        );
+      });
+    });
+  },
+
+  replayMacro: function (url, tabId, force = false) {
     var key = siteMacro.getKey(url);
+    if (siteMacro.status[tabId] == "Active") return;
     if (key in siteMacro.database) {
       var data = siteMacro.database[key];
-      if (Date.now() - data.last < 10000) {
+      if (!force && Date.now() - data.last < 10000) {
         siteMacro.setTabStatus(tabId, "Throttled");
         return;
       }
@@ -115,18 +133,24 @@ var siteMacro = {
 
       data.last = Date.now();
       siteMacro.database[key].last = Date.now();
-      chrome.storage.local.set({ key: siteMacro.database[key] });
+      const update = {}; 
+      update[key] = siteMacro.database[key];
+      chrome.storage.local.set(update);
 
-      chrome.tabs.sendMessage(tabId, data.steps, (resp) => {
-        switch (resp) {
-          case chrome.i18n.getMessage("badgeFailed"):
-            siteMacro.setTabStatus(tabId, "Failed");
-            break;
-          case chrome.i18n.getMessage("badgeCompleted"):
-            siteMacro.setTabStatus(tabId, "Completed");
-            break;
+      chrome.tabs.sendMessage(
+        tabId,
+        { command: "replay", steps: data.steps },
+        (resp) => {
+          switch (resp) {
+            case chrome.i18n.getMessage("badgeFailed"):
+              siteMacro.setTabStatus(tabId, "Failed");
+              break;
+            case chrome.i18n.getMessage("badgeCompleted"):
+              siteMacro.setTabStatus(tabId, "Completed");
+              break;
+          }
         }
-      });
+      );
     } else {
       siteMacro.setTabStatus(tabId, "Idle");
     }
@@ -170,9 +194,6 @@ var siteMacro = {
   },
 
   recordMacro: function (url, tabId) {
-    chrome.permissions.request({ origins: [url] }, (granted) => {
-      if (!granted) siteMacro.cancelMacro(tabId);
-    });
     if (chrome.scripting) {
       chrome.scripting.executeScript(
         { target: { tabId }, files: ["/scripts/record.js"] },
@@ -188,7 +209,7 @@ var siteMacro = {
   },
 
   cancelMacro: function (tabId) {
-    chrome.tabs.sendMessage(tabId, "cancel", () => {
+    chrome.tabs.sendMessage(tabId, { command: "cancel" }, () => {
       siteMacro.setTabStatus(tabId, "Idle");
     });
   },
@@ -210,11 +231,6 @@ var siteMacro = {
     for (var i = 0; i < origins.length; i++) {
       siteMacro.registerContentScript(origins[i]);
     }
-
-    chrome.permissions.contains({ origins: origins }, (result) => {
-      if (!result)
-        chrome.tabs.create({ url: chrome.runtime.getURL("permissions.htm") });
-    });
   },
 
   registerContentScript: function (url) {
@@ -227,12 +243,8 @@ var siteMacro = {
 
   init: function () {
     chrome.tabs.onUpdated.addListener(siteMacro.tabUpdated);
-    if (chrome.action) {
-      chrome.action.onClicked.addListener(siteMacro.clicked);
-    } else {
-      chrome.browserAction.onClicked.addListener(siteMacro.clicked);
-    }
     chrome.runtime.onMessage.addListener(siteMacro.message);
+    chrome.runtime.onConnect.addListener(siteMacro.connect);
     chrome.storage.local.get(null, (data) => {
       siteMacro.database = data;
       siteMacro.checkDatabase();

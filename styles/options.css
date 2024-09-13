@@ -1,13 +1,67 @@
-body {padding: 5px; min-height: 30em; }
+@media screen and (min-width: 450px) {
+  body {min-width: 40em; }
+}
 
-#steps {overflow-y: auto; height: 20em; }
-
-#apply {display: flex; align-items: baseline; }
-#apply select, #apply label {flex: 0 0 auto; }
-#apply select {margin: 0 5px; }
-#apply #prefix { flex-grow: 1; }
-
-#buttons {text-align: right; margin: 5px 0; }
-#buttons button { padding: 1px; width: 8em; text-align: center; }
-#file {display: none; }
-#status {margin: 5px 0;}
+body {
+  font-family: sans-serif;
+  padding: 4px;
+  margin: 8px auto;
+  width: 90%;
+  max-width: 60em;
+}
+main {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.card {
+  display: flex;
+  gap: 4px;
+  padding: 8px;
+  flex-direction: column;
+  background: #f8f8f8;
+  border: solid #ddd 1px;
+  border-radius: 8px;
+  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.4);
+}
+.card .header {
+  display: flex;
+  flex-direction: row;
+  font-weight: bold;
+  background: #f8f8f8;
+  cursor: pointer;
+  padding: 8px;
+  margin: -8px;
+  border: none 0px;
+}
+.card .header div {
+  flex-grow: 1;
+  white-space: nowrap;
+  overflow-x: hidden;
+}
+.card .header .expand {
+  flex-grow: 0;
+  flex-shrink: 0;
+  width: 1.5em;
+  text-align: center;
+}
+.card .actions {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  margin: 4px 0 0 0;
+}
+.apply {
+  display: flex;
+  flex-direction: row;
+  word-break: nowrap;
+}
+.prefix {
+  flex-grow: 1;
+}
+button {
+  border: solid #ddd 1px;
+  padding: 8px;
+  border-radius: 8px;
+  text-align: left;
+}

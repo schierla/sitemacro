@@ -1,20 +1,23 @@
 var siteMacroReplay = {
     started: false,
-    message: function(steps, sender, response) {
+    message: function(message, sender, response) {
+        if(message.command != "replay") return false;
         if(siteMacroReplay.started) return false;
         siteMacroReplay.started = true;
-        siteMacroReplay.execute(steps, response);
+        siteMacroReplay.execute(message.steps, response);
         return true;
     }, 
     execute: function(steps, response) {
         if(steps.length == 0) {
             response(chrome.i18n.getMessage("badgeCompleted"));
+            siteMacroReplay.started = false;
         } else {
             var step = steps.shift();
             if(step.type == "click") {
                 var elem = siteMacroReplay.elem(step.target);
                 if(!siteMacroReplay.checkElem(step, elem)) {
                     response(chrome.i18n.getMessage("badgeFailed")); 
+                    siteMacroReplay.started = false;
                     return; 
                 }
                 var event = new MouseEvent('click', { view: window, bubbles: true, cancelable: true });
@@ -23,6 +26,7 @@ var siteMacroReplay = {
                 var elem = siteMacroReplay.elem(step.target);
                 if(!siteMacroReplay.checkElem(step, elem)) {
                     response(chrome.i18n.getMessage("badgeFailed")); 
+                    siteMacroReplay.started = false;
                     return; 
                 }
                 elem.value = step.value;
@@ -31,6 +35,7 @@ var siteMacroReplay = {
                 return;
             } else if(step.type == "close") {
                 response(chrome.i18n.getMessage("badgeCompleted"));
+                siteMacroReplay.started = false;
                 chrome.runtime.sendMessage({command: "closeTab"});
             } else {
                 console.log("SiteMacro: Invalid step type " + step.type);
@@ -57,4 +62,3 @@ var siteMacroReplay = {
 }
 
 chrome.runtime.onMessage.addListener(siteMacroReplay.message);
-chrome.runtime.sendMessage({command: "replay"});

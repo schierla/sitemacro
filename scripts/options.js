@@ -1,63 +1,6 @@
-var database = {};
-var _pages = document.getElementById("pages");
-var _steps = document.getElementById("steps");
-var _delete = document.getElementById("delete");
-var _save = document.getElementById("save");
-var _export = document.getElementById("export");
-var _import = document.getElementById("import");
-var _file = document.getElementById("file");
-var _details = document.getElementById("details");
-var _type = document.getElementById("type");
-var _prefix = document.getElementById("prefix");
-var _status = document.getElementById("status");
+import { h, text, app } from "./hyperapp/index.js";
 
-_delete.appendChild(
-  document.createTextNode(chrome.i18n.getMessage("optionDelete"))
-);
-_save.appendChild(
-  document.createTextNode(chrome.i18n.getMessage("optionSave"))
-);
-_export.appendChild(
-  document.createTextNode(chrome.i18n.getMessage("optionExport"))
-);
-_import.appendChild(
-  document.createTextNode(chrome.i18n.getMessage("optionImport"))
-);
-document
-  .getElementById("applyTo")
-  .appendChild(
-    document.createTextNode(chrome.i18n.getMessage("optionApplyTo"))
-  );
-document
-  .getElementById("optionExact")
-  .appendChild(document.createTextNode(chrome.i18n.getMessage("optionExact")));
-document
-  .getElementById("optionPrefix")
-  .appendChild(document.createTextNode(chrome.i18n.getMessage("optionPrefix")));
-
-var reload = function () {
-  chrome.storage.local.get(null, (data) => {
-    database = data;
-    while (_pages.firstChild) _pages.removeChild(_pages.firstChild);
-    var option = document.createElement("option");
-    option.appendChild(
-      document.createTextNode(chrome.i18n.getMessage("optionPlaceholder"))
-    );
-    _pages.appendChild(option);
-    for (var key in data) {
-      if (key.startsWith("data/")) {
-        var url = key.substring(5);
-        var option = document.createElement("option");
-        option.value = url;
-        option.appendChild(document.createTextNode(url));
-        _pages.appendChild(option);
-      }
-    }
-    selected();
-  });
-};
-
-var elemName = function (step) {
+const elemName = function (step) {
   if (step.name) {
     return chrome.i18n.getMessage("elemName", [step.target, step.name]);
   } else if (step.text) {
@@ -67,100 +10,16 @@ var elemName = function (step) {
   }
 };
 
-var selected = function () {
-  var key = "data/" + _pages.value;
-  var data = database[key];
-  while (_steps.firstChild) _steps.removeChild(_steps.firstChild);
-  _details.style.display = "none";
-  _import.style.display = "inline";
-  if (!data) return;
-  _status.innerText = "";
-  for (var i = 0; i < data.steps.length; i++) {
-    var li = document.createElement("li");
-    var step = data.steps[i];
-    if (step.type == "click") {
-      li.appendChild(
-        document.createTextNode(
-          chrome.i18n.getMessage("stepClick", elemName(step))
-        )
-      );
-    } else if (step.type == "change") {
-      li.appendChild(
-        document.createTextNode(
-          chrome.i18n.getMessage("stepChange", [step.value, elemName(step)])
-        )
-      );
-    } else if (step.type == "wait") {
-      li.appendChild(
-        document.createTextNode(
-          chrome.i18n.getMessage("stepWait", [step.duration])
-        )
-      );
-    } else if (step.type == "close") {
-      li.appendChild(
-        document.createTextNode(chrome.i18n.getMessage("stepClose"))
-      );
-    }
-    _steps.appendChild(li);
+const stepText = function (step) {
+  if (step.type == "click") {
+    return chrome.i18n.getMessage("stepClick", elemName(step));
+  } else if (step.type == "change") {
+    return chrome.i18n.getMessage("stepChange", [step.value, elemName(step)]);
+  } else if (step.type == "wait") {
+    return chrome.i18n.getMessage("stepWait", [step.duration]);
+  } else if (step.type == "close") {
+    return document.createTextNode(chrome.i18n.getMessage("stepClose"));
   }
-
-  _type.value = "exact";
-  _prefix.value = "";
-
-  if (database.prefix) {
-    for (var key in database.prefix) {
-      if (database.prefix[key] == _pages.value) {
-        _type.value = "prefix";
-        _prefix.value = key;
-      }
-    }
-  }
-  _prefix.oldValue = _prefix.value;
-  typeChanged();
-
-  _details.style.display = "block";
-  _import.style.display = "none";
-};
-
-var deleted = function () {
-  var key = "data/" + _pages.value;
-  if (!database[key]) return;
-  chrome.runtime.sendMessage({ command: "delete", url: _pages.value }, reload);
-};
-
-var saved = function () {
-  var key = "data/" + _pages.value;
-  if (!database[key]) return;
-
-  if (database.prefix && _prefix.oldValue in database.prefix) {
-    chrome.runtime.sendMessage(
-      { command: "deletePrefix", prefix: _prefix.oldValue },
-      reload
-    );
-  }
-
-  if (_prefix.value != "") {
-    chrome.runtime.sendMessage(
-      { command: "addPrefix", prefix: _prefix.value, url: _pages.value },
-      reload
-    );
-    chrome.permissions.request({ origins: [_prefix.value + "*"] });
-  }
-
-  reload();
-};
-
-var exported = function () {
-  var key = "data/" + _pages.value;
-  if (!database[key]) return;
-  downloadToFile(
-    "macro_" + _pages.value.replace(/[^a-zA-Z0-9]+/g, "_") + ".json",
-    JSON.stringify({
-      url: _pages.value,
-      prefix: _prefix.value == "" ? undefined : _prefix.value,
-      steps: database[key].steps,
-    })
-  );
 };
 
 var downloadToFile = function (filename, content) {
@@ -176,75 +35,254 @@ var downloadToFile = function (filename, content) {
   document.body.removeChild(element);
 };
 
-function imported(f) {
-  _status.innerText = "";
-  var reader = new FileReader();
-  reader.onload = (progress) => {
-    try {
-      var data = JSON.parse(progress.target.result);
-      if (!data.url) throw "No URL given";
-      if (!data.steps) throw "No steps given";
-      if ("data/" + data.url in database)
-        throw "Macro for this URL already exists";
-      chrome.runtime.sendMessage(
-        {
-          command: "add",
-          url: data.url,
-          steps: data.steps,
-        },
-        () => {
-          var prefix = data.prefix && data.prefix != "" ? data.prefix : false;
-          chrome.permissions.request(
-            { origins: prefix ? [data.url, data.prefix + "*"] : [data.url] },
-            () => {
-              if (prefix) {
-                chrome.runtime.sendMessage(
-                  {
-                    command: "addPrefix",
-                    prefix: data.prefix,
-                    url: data.url,
-                  },
-                  () => {
-                    reload();
-                    _status.innerText = "Import successful.";
-                  }
-                );
-              } else {
-                reload();
-                _status.innerText = "Import successful.";
-              }
-            }
-          );
-        }
-      );
-    } catch (e) {
-      _status.innerText = "Error importing:\n" + e;
-    }
-  };
-  reader.readAsText(f);
-}
-
-var typeChanged = function () {
-  if (_type.value == "prefix") {
-    _prefix.removeAttribute("disabled");
-    if (_prefix.value == "") _prefix.value = _pages.value;
-  } else {
-    _prefix.setAttribute("disabled", "disabled");
-    _prefix.value = "";
+const exportMacro = function (_, { database, url, prefix }) {
+  const key = "data/" + url;
+  downloadToFile(
+    "macro_" + url.replace(/[^a-zA-Z0-9]+/g, "_") + ".json",
+    JSON.stringify({
+      url: url,
+      prefix: prefix == "" ? undefined : prefix,
+      steps: database[key].steps,
+    })
+  );
+};
+const deleteMacro = (_, { url }) => {
+  chrome.runtime.sendMessage({ command: "delete", url });
+};
+const saveMacro = (_, { database, url, oldPrefix, prefix }) => {
+  if (database.prefix && oldPrefix in database.prefix) {
+    chrome.runtime.sendMessage({
+      command: "deletePrefix",
+      prefix: oldPrefix,
+    });
+  }
+  if (prefix != "") {
+    chrome.runtime.sendMessage({
+      command: "addPrefix",
+      prefix: prefix,
+      url: url,
+    });
+    chrome.permissions.request({ origins: [prefix + "*"] });
   }
 };
+const importMacro = (dispatch, { database }) => {
+  const input = document.createElement("input");
+  input.type = "file";
+  document.body.appendChild(input);
+  input.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    dispatch([SetImportStatus, ""]);
+    var reader = new FileReader();
+    reader.onload = (progress) => {
+      try {
+        var data = JSON.parse(progress.target.result);
+        if (!data.url) throw "No URL given";
+        if (!data.steps) throw "No steps given";
+        if ("data/" + data.url in database)
+          throw "Macro for this URL already exists";
+        chrome.runtime.sendMessage(
+          {
+            command: "add",
+            url: data.url,
+            steps: data.steps,
+          },
+          () => {
+            var prefix = data.prefix && data.prefix != "" ? data.prefix : false;
+            chrome.permissions.request(
+              { origins: prefix ? [data.url, data.prefix + "*"] : [data.url] },
+              () => {
+                if (prefix) {
+                  chrome.runtime.sendMessage(
+                    {
+                      command: "addPrefix",
+                      prefix: data.prefix,
+                      url: data.url,
+                    },
+                    () => {
+                      dispatch([SetImportStatus, "Import successful."]);
+                    }
+                  );
+                } else {
+                  dispatch([SetImportStatus, "Import successful."]);
+                }
+              }
+            );
+          }
+        );
+      } catch (e) {
+        dispatch([SetImportStatus, "Error importing:\n" + e]);
+      }
+    };
+    reader.readAsText(file);
+  });
+  input.click();
+  document.body.removeChild(input);
+};
+const openPage = (_, { url }) => {
+  chrome.tabs.create({ url });
+};
 
-_pages.addEventListener("change", selected);
-_delete.addEventListener("click", deleted);
-_type.addEventListener("change", typeChanged);
-_save.addEventListener("click", saved);
-_export.addEventListener("click", exported);
-_import.addEventListener("click", function () {
-  _file.click();
+const SetDatabase = (state, database) => ({ ...state, database });
+const SelectPage = (state, url) => {
+  var prefix = "";
+  if (state.database.prefix) {
+    for (var key in state.database.prefix) {
+      if (state.database.prefix[key] == url) {
+        prefix = key;
+      }
+    }
+  }
+  return { ...state, url, prefix, oldPrefix: prefix, importStatus: "" };
+};
+const ExportMacro = (state) => [
+  state,
+  [
+    exportMacro,
+    { database: state.database, url: state.url, prefix: state.prefix },
+  ],
+];
+const DeleteMacro = (state) => [state, [deleteMacro, { url: state.url }]];
+const OpenPage = (state) => [state, [openPage, { url: state.url }]];
+const SaveMacro = (state) => [
+  { ...state, url: "" },
+  [
+    saveMacro,
+    {
+      database: state.database,
+      url: state.url,
+      oldPrefix: state.oldPrefix,
+      prefix: state.prefix,
+    },
+  ],
+];
+const ImportMacro = (state) => [
+  { ...state, url: "" },
+  [importMacro, { database: state.database }],
+];
+const SetPrefix = (state, prefix) => ({ ...state, prefix });
+const SetImportStatus = (state, importStatus) => ({ ...state, importStatus });
+
+const databaseSubscription = [
+  (dispatch, _) => {
+    chrome.storage.local.get(null, (database) => {
+      requestAnimationFrame(() => dispatch([SetDatabase, database]));
+    });
+    chrome.storage.local.onChanged.addListener(() => {
+      chrome.storage.local.get(null, (database) => {
+        requestAnimationFrame(() => dispatch([SetDatabase, database]));
+      });
+    });
+  },
+  {},
+];
+
+app({
+  init: { database: {}, url: "", oldPrefix: "", prefix: "", importStatus: "" },
+  view: (state) => {
+    return h("main", {}, [
+      h("div", { className: "card" }, [
+        h(
+          "button",
+          { type: "import", onclick: ImportMacro, className: "header" },
+          text(chrome.i18n.getMessage("optionImport"))
+        ),
+        state.importStatus != "" &&
+          h("div", { className: "status" }, text(state.importStatus)),
+      ]),
+      ...Object.keys(state.database)
+        .filter((key) => key.startsWith("data/"))
+        .map((key) => key.substring(5))
+        .map((url) =>
+          h("div", { className: "card" }, [
+            h(
+              "button",
+              {
+                className: "header",
+                onclick: [SelectPage, url == state.url ? "" : url],
+                title: url,
+              },
+              [
+                h("div", {}, text(url)),
+                h(
+                  "div",
+                  { className: "expand" },
+                  text(url == state.url ? "-" : "+")
+                ),
+              ]
+            ),
+            url == state.url &&
+              h("div", { className: "body" }, [
+                h(
+                  "ol",
+                  { className: "steps" },
+                  state.database["data/" + state.url].steps.map((step) =>
+                    h("li", {}, text(stepText(step)))
+                  )
+                ),
+                h("div", { className: "apply" }, [
+                  h("label", { for: "type" }, [
+                    text(chrome.i18n.getMessage("optionApplyTo")),
+                    h(
+                      "select",
+                      {
+                        onchange: (_, e) => [
+                          SetPrefix,
+                          e.target.value == "exact"
+                            ? ""
+                            : state.prefix || state.url,
+                        ],
+                      },
+                      [
+                        h(
+                          "option",
+                          { value: "exact" },
+                          text(chrome.i18n.getMessage("optionExact"))
+                        ),
+                        h(
+                          "option",
+                          { value: "prefix", selected: state.prefix != "" },
+                          text(chrome.i18n.getMessage("optionPrefix"))
+                        ),
+                      ]
+                    ),
+                  ]),
+                  h("input", {
+                    type: "text",
+                    class: "prefix",
+                    disabled: state.prefix == "",
+                    onchange: (_, e) => [SetPrefix, e.target.value],
+                    value: state.prefix == "" ? state.url : state.prefix,
+                  }),
+                ]),
+              ]),
+            url == state.url &&
+              h("div", { className: "actions" }, [
+                state.prefix != state.oldPrefix &&
+                  h(
+                    "button",
+                    { onclick: SaveMacro },
+                    text(chrome.i18n.getMessage("optionSave"))
+                  ),
+                h(
+                  "button",
+                  { onclick: ExportMacro },
+                  text(chrome.i18n.getMessage("optionExport"))
+                ),
+                h(
+                  "button",
+                  { onclick: DeleteMacro },
+                  text(chrome.i18n.getMessage("optionDelete"))
+                ),
+                h(
+                  "button",
+                  { onclick: OpenPage },
+                  text(chrome.i18n.getMessage("optionOpen"))
+                ),
+              ]),
+          ])
+        ),
+    ]);
+  },
+  node: document.getElementById("app"),
+  subscriptions: () => [databaseSubscription],
 });
-_file.addEventListener("change", function (e) {
-  imported(e.target.files[0]);
-});
-reload();
-selected();
-typeChanged();

@@ -9,60 +9,136 @@
     },
 
     "statusIdle": {
-        "message": "SiteMacro is ready.\n\nClick to record a macro for this page.", 
-        "description": "Default tooltip"
+        "message": "ready", 
+        "description": "Default status message"
     },
     "badgeIdle": {
         "message": "", 
         "description": "Default Badge text"
     },
     "statusThrottled": {
-        "message": "SiteMacro did not execute a macro: \nPage repeated too quickly. \n\nClick to delete the macro.", 
-        "description": "Tooltip when returning to page too quickly" 
+        "message": "skipped automatic macro execution; page repeated too quickly", 
+        "description": "Status message when returning to page too quickly" 
     },
     "badgeThrottled": {
         "message": "❙❙", 
         "description": "Badge text when returning to page too quickly"
     },
     "statusActive": {
-        "message": "SiteMacro is executing a macro.", 
-        "description": "Tooltip while executing the macro"
+        "message": "... executing a macro ...", 
+        "description": "Status message while executing the macro"
     },
     "badgeActive": {
         "message": "▶",
         "description": "Badge text while executing the macro"
     },
     "statusFailed": {
-        "message": "SiteMacro failed to execute a macro: \nRequired element not found. \n\nClick to delete the macro.",
-        "description": "Tooltip when macro execution failed"
+        "message": "failed while executing a macro; required element not found",
+        "description": "Status message when macro execution failed"
     },
     "badgeFailed": {
         "message": "⨯", 
         "description": "Badge text when macro execution failed"
     },
     "statusCompleted": {
-        "message": "SiteMacro successfullly executed a macro. \n\nClick to delete the macro.",
-        "description": "Tooltip when macro execution finished"
+        "message": "successfully executed a macro",
+        "description": "Status message when macro execution finished"
     },
     "badgeCompleted": {
         "message": "✓",
         "description": "Badge text when macro execution finished"
     },
     "statusRecording": {
-        "message": "SiteMacro is recording a macro. \n\nClick to cancel recording.",
-        "description": "Tooltip while recording the macro"
+        "message": "... recording a macro ...",
+        "description": "Status message while recording the macro"
     }, 
     "badgeRecording": {
         "message": "●", 
         "description": "Badge text while recording the macro"
     },
     "statusRecorded": {
-        "message": "SiteMacro successfully recorded a macro.",
-        "description": "Tooltip after recording the macro"
+        "message": "successfully recorded a macro",
+        "description": "Status message after recording the macro"
     }, 
     "badgeRecorded": {
         "message": "◼", 
         "description": "Badge text after recording the macro"
+    },
+
+    "exactMacro": {
+        "message": "Macro for this page", 
+        "description": "A macro applied to a specific URL"
+    },
+    "prefixMacro": {
+        "message": "Macro for multiple pages", 
+        "description": "A macro applied to all URLs with a given prefix"
+    },
+    "stateEnabled": {
+        "message": "enabled", 
+        "description": "A macro that is executed automatically"
+    },
+    "stateDisabled": {
+        "message": "disabled due to missing permissions", 
+        "description": "A macro that is not automatically executed due to permission issues"
+    },
+    "stateSuppressed": {
+        "message": "suppressed by other more specific macro", 
+        "description": "A macro that is not automatically executed because a more specific macro exists"
+    },
+
+    "popupStatus": {
+        "message": "Status", 
+        "description": "Description text for the status"
+    },
+    "popupExecute": {
+        "message": "Execute", 
+        "description": "Button to execute the macro"
+    },
+    "popupEnable": {
+        "message": "Enable",
+        "description": "Button to enable the macro"
+    },
+    "popupDelete": {
+        "message": "Delete",
+        "description": "Button to delete the macro"
+    },
+    "popup0Step": {
+        "message": "0 steps",
+        "description": "Text for macros containing no steps"
+    },
+    "popup1Step": {
+        "message": "1 step",
+        "description": "Text for macros containing one step"
+    },
+    "popupNStep": {
+        "message": "$STEPS$ steps",
+        "description": "Text for macros containing one step",
+        "placeholders": {"steps": {"content": "$1", "example": "3"}}
+    },
+    "popupMore": {
+        "message": "Further Macros", 
+        "description": "Description text for further macros"
+    },
+    "popup0Macro": {
+        "message": "no macros", 
+        "description": "Text for no macros"
+    },
+    "popup1Macro": {
+        "message": "1 macro", 
+        "description": "Text for one macros"
+    },
+    "popupNMacro": {
+        "message": "$COUNT$ macros", 
+        "description": "Text for one macros",
+        "placeholders": {"count": {"content": "$1", "example": "3"}}
+    },
+    "popupRecord": {
+        "message": "Record Macro",
+        "description": "Button to record a new macro"
+    },
+    "popupManage": {
+        "message": "Manage Macros", 
+        "description": "Button to manage existing macros"
     },
 
     "stepChange": {
@@ -114,7 +190,7 @@
         "description": "Button to export selected macro to file"
     }, 
     "optionImport": {
-        "message": "Import", 
+        "message": "Import Macro", 
         "description": "Button to import macro from file"
     }, 
     "optionSave": {
@@ -133,32 +209,11 @@
         "message": "URLs starting with:", 
         "description": "Option to apply macro to all pages starting with the given URL"
     },
-    
-    "permissionTitle": {
-        "message": "To execute macros, SiteMacro requires permission to access these pages.", 
-        "description": "Title for the permission page"
+    "optionOpen": {
+        "message": "Open",
+        "description": "Button to open the page"
     },
-    "permissionAllowed": {
-        "message": "Allowed Pages:", 
-        "description": "List headline for allowed pages"
-    },
-    "permissionMissing": {
-        "message": "Missing Pages:", 
-        "description": "List headline for pages with missing permission"
-    },
-    "permissionGrant": {
-        "message": "Grant Permission", 
-        "description": "Button to grant permission"
-    },
-    "permissionRemove": {
-        "message": "Remove Macros", 
-        "description": "Button to remove macros"
-    },
-    "permissionDone": {
-        "message": "✓ Thank you, all required permissions have been granted.", 
-        "description": "Text that all required permissions have been granted"
-    },
-    
+        
     "pageRecording": {
         "message": "SiteMacro: Recording...",
         "description": "Text shown in page while recording"

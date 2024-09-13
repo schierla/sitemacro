@@ -1,7 +1,7 @@
 {
 	"manifest_version": 2,
 	"name": "__MSG_extensionName__",
-	"version": "0.8",
+	"version": "0.9",
 	"description": "__MSG_extensionDescription__",
 	"default_locale": "en",
 	"icons": {
@@ -24,6 +24,7 @@
 			"32": "icons/icon-32.png"
 		},
 		"default_title": "__MSG_extensionName__", 
+		"default_popup": "popup.htm",		
 		"theme_icons": [
 			{"light": "icons/icon-w.svg", "dark": "icons/icon.svg", "size": 16},
 			{"light": "icons/icon-w.svg", "dark": "icons/icon.svg", "size": 32}

@@ -1,0 +1,58 @@
+@media screen and (min-width: 450px) {
+  body {min-width: 30em; }
+}
+
+body {
+  font-family: sans-serif;
+  padding: 4px;
+  margin: 0;
+  background: #f8f8f8;
+}
+
+.card {
+  display: flex;
+  gap: 4px;
+  margin: 8px 4px;
+  padding: 8px;
+  flex-direction: column;
+  background: #f8f8f8;
+  border: solid #ddd 1px;
+  border-radius: 8px;
+  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.4);
+}
+.card .macro {
+  display: flex;
+  flex-direction: row;
+}
+.card .title {
+  flex-grow: 1;
+  font-weight: bold;
+}
+.card .steps {
+  flex-grow: 0;
+  text-align: right;
+}
+.card .run {
+  display: flex;
+  flex-direction: row;
+}
+.card .status {
+  font-style: italic;
+  flex-grow: 1;
+}
+.card .autorun {
+  text-align: right;
+}
+.actions {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  margin-top: 4px;
+}
+.actions button {
+  flex-grow: 0;
+  text-align: left;
+  border: solid #ddd 1px;
+  padding: 8px;
+  border-radius: 8px;
+}
