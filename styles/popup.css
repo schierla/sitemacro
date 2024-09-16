@@ -1,12 +1,9 @@
-@media screen and (min-width: 450px) {
-  body {min-width: 30em; }
-}
-
 body {
   font-family: sans-serif;
   padding: 4px;
   margin: 0;
   background: #f8f8f8;
+  min-width: 25em;
 }
 
 .card {
@@ -53,6 +50,10 @@ body {
   flex-grow: 0;
   text-align: left;
   border: solid #ddd 1px;
+  background: #f4f4f4;
   padding: 8px;
   border-radius: 8px;
+}
+.actions button:hover {
+  background: #eee;
 }

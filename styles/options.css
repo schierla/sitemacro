@@ -1,13 +1,10 @@
-@media screen and (min-width: 450px) {
-  body {min-width: 40em; }
-}
-
 body {
   font-family: sans-serif;
   padding: 4px;
   margin: 8px auto;
   width: 90%;
   max-width: 60em;
+  min-width: 25em;
 }
 main {
   display: flex;
@@ -64,4 +61,8 @@ button {
   padding: 8px;
   border-radius: 8px;
   text-align: left;
+  background: #f8f8f8;
+}
+button:hover {
+  background: #eee;
 }

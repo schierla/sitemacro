@@ -20,7 +20,7 @@ var siteMacroRecord = {
 
   updateSteps: function () {
     const steps = siteMacroRecord.steps.length;
-    siteMacroRecord.counter.innerHTML =
+    siteMacroRecord.counter.data =
       steps == 0
         ? chrome.i18n.getMessage("popup0Step")
         : steps == 1
@@ -150,9 +150,8 @@ var siteMacroRecord = {
     div1.style.height = "100vh";
 
     var counter = document.createElement("span");
-    counter.appendChild(
-      document.createTextNode(chrome.i18n.getMessage("popup0Step"))
-    );
+    var value = document.createTextNode(chrome.i18n.getMessage("popup0Step"));
+    counter.appendChild(value);
     div1.appendChild(document.createTextNode(" ("));
     div1.appendChild(counter);
     div1.appendChild(document.createTextNode(")"));
@@ -218,7 +217,7 @@ var siteMacroRecord = {
     var root = document.createElement("sitemacroroot");
     root.appendChild(div1);
     root.appendChild(div2);
-    siteMacroRecord.counter = counter;
+    siteMacroRecord.counter = value;
     siteMacroRecord.root = root;
 
     document.body.appendChild(root);
