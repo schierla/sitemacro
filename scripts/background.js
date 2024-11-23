@@ -160,7 +160,6 @@ var siteMacro = {
     if (!siteMacro.database.prefix) siteMacro.database.prefix = {};
     siteMacro.database.prefix[prefix] = url;
     chrome.storage.local.set({ prefix: siteMacro.database.prefix });
-    siteMacro.registerContentScript(prefix + "*");
   },
 
   deletePrefix: function (prefix) {
@@ -176,7 +175,6 @@ var siteMacro = {
     data[key] = { steps: steps, created: Date.now(), last: Date.now() - 15000 };
     siteMacro.database[key] = data[key];
     chrome.storage.local.set(data, () => {});
-    siteMacro.registerContentScript(url);
   },
 
   deleteMacro: function (url) {
@@ -214,32 +212,6 @@ var siteMacro = {
     });
   },
 
-  checkDatabase: function () {
-    var origins = [];
-    if (siteMacro.database)
-      for (var key in siteMacro.database) {
-        if (key.startsWith("data/")) {
-          origins.push(key.substr(5));
-        }
-      }
-
-    if (siteMacro.database.prefix)
-      for (var key in siteMacro.database.prefix) {
-        origins.push(key + "*");
-      }
-
-    for (var i = 0; i < origins.length; i++) {
-      siteMacro.registerContentScript(origins[i]);
-    }
-  },
-
-  registerContentScript: function (url) {
-    if (chrome.contentScripts)
-      chrome.contentScripts.register({
-        js: [{ file: "scripts/replay.js" }],
-        matches: [url.replace(/#.*$/, "")],
-      });
-  },
 
   init: function () {
     chrome.tabs.onUpdated.addListener(siteMacro.tabUpdated);
@@ -247,7 +219,6 @@ var siteMacro = {
     chrome.runtime.onConnect.addListener(siteMacro.connect);
     chrome.storage.local.get(null, (data) => {
       siteMacro.database = data;
-      siteMacro.checkDatabase();
     });
   },
 };
