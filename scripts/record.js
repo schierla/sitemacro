@@ -115,7 +115,11 @@ var siteMacroRecord = {
         if (c.nodeName == t.nodeName) num++;
         c = c.nextSibling;
       }
-      path = "/" + t.nodeName.toLowerCase() + "[" + num + "]" + path;
+      if(t.namespaceURI == "http://www.w3.org/1999/xhtml") {
+        path = "/" + t.nodeName.toLowerCase() + "[" + num + "]" + path;
+      } else {
+        path = "/*[name()='" + t.nodeName.toLowerCase() + "'][" + num + "]" + path;
+      }
       t = t.parentNode;
       if (t.id != "") return 'id("' + t.id + '")' + path;
     }
