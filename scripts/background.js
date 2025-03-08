@@ -124,7 +124,7 @@ var siteMacro = {
     if (siteMacro.status[tabId] == "Active") return;
     if (key in siteMacro.database) {
       var data = siteMacro.database[key];
-      if (!force && Date.now() - data.last < 10000) {
+      if (!force && Date.now() - data.last < 10000 && data.lastTab == tabId) {
         siteMacro.setTabStatus(tabId, "Throttled");
         return;
       }
@@ -132,7 +132,9 @@ var siteMacro = {
       siteMacro.setTabStatus(tabId, "Active");
 
       data.last = Date.now();
+      data.lastTab = tabId;
       siteMacro.database[key].last = Date.now();
+      siteMacro.database[key].lastTab = tabId;
       const update = {}; 
       update[key] = siteMacro.database[key];
       chrome.storage.local.set(update);
