@@ -2,6 +2,6 @@
   "name": "sitemacro",
   "devDependencies": {
     "hyperapp": "^2.0.22",
-    "web-ext": "^10.0.0"
+    "web-ext": "^10.3.0"
   }
 }
