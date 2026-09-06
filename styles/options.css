@@ -66,3 +66,73 @@ button {
 button:hover {
   background: #eee;
 }
+button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.steps li {
+  margin: 8px 0;
+}
+.steps.editing {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  margin: 0;
+}
+.steps .step-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  margin: 0;
+  padding: 4px 8px;
+  background: #fff;
+  border: solid #ddd 1px;
+  border-radius: 8px;
+}
+.step-type {
+  flex: 0 0 5em;
+  white-space: nowrap;
+}
+.step-fields {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  gap: 8px;
+}
+.step-fields .field {
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+  font-size: 0.85em;
+  gap: 2px;
+  min-width: 0;
+}
+.step-fields input {
+  width: 100%;
+  box-sizing: border-box;
+  border: solid #ddd 1px;
+  border-radius: 4px;
+  padding: 4px;
+}
+.step-actions {
+  display: flex;
+  flex-direction: row;
+  flex-shrink: 0;
+  gap: 4px;
+}
+.step-actions button {
+  padding: 4px 8px;
+}
+.steps .add-step-row {
+  display: flex;
+  flex-direction: row;
+  margin: 0;
+}
+.add-step {
+  border: solid #ddd 1px;
+  border-radius: 8px;
+  padding: 8px;
+  background: #f8f8f8;
+}

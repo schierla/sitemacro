@@ -13,6 +13,11 @@ const recordMacro = function (_, { tabId, url }) {
 const deleteMacro = function (_, { tabId, url }) {
   chrome.runtime.sendMessage({ command: "delete", url, tabId: tabId });
 };
+const editMacro = function (_, { url }) {
+  chrome.tabs.create({
+    url: chrome.runtime.getURL("options.htm") + "?open=" + encodeURIComponent(url),
+  });
+};
 const executeMacro = function (_, { tabId, url }) {
   chrome.runtime.sendMessage({
     command: "execute",
@@ -33,6 +38,7 @@ const DeleteMacro = (state, url) => [
   state,
   [deleteMacro, { url, tabId: state.tabId }],
 ];
+const EditMacro = (state, url) => [state, [editMacro, { url }], close];
 const ExecuteMacro = (state, url) => [
   state,
   [executeMacro, { url, tabId: state.tabId }],
@@ -163,6 +169,11 @@ app({
               "button",
               { onclick: [ExecuteMacro, key.url] },
               text(chrome.i18n.getMessage("popupExecute"))
+            ),
+            h(
+              "button",
+              { onclick: [EditMacro, key.url] },
+              text(chrome.i18n.getMessage("popupEdit"))
             ),
             !state.granted &&
               h(

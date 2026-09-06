@@ -18,7 +18,7 @@ const stepText = function (step) {
   } else if (step.type == "wait") {
     return chrome.i18n.getMessage("stepWait", [step.duration]);
   } else if (step.type == "close") {
-    return document.createTextNode(chrome.i18n.getMessage("stepClose"));
+    return chrome.i18n.getMessage("stepClose");
   }
 };
 
@@ -121,18 +121,140 @@ const importMacro = (dispatch, { database }) => {
 const openPage = (_, { url }) => {
   chrome.tabs.create({ url });
 };
+const saveSteps = (_, { url, steps }) => {
+  chrome.runtime.sendMessage({ command: "update", url, steps });
+};
 
-const SetDatabase = (state, database) => ({ ...state, database });
-const SelectPage = (state, url) => {
+const stepTypeLabel = function (type) {
+  if (type == "click") return chrome.i18n.getMessage("optionTypeClick");
+  if (type == "change") return chrome.i18n.getMessage("optionTypeChange");
+  if (type == "wait") return chrome.i18n.getMessage("optionTypeWait");
+  if (type == "close") return chrome.i18n.getMessage("optionTypeClose");
+};
+
+const stepField = function (label, index, field, value, inputType) {
+  return h("label", { className: `field field-${field}` }, [
+    text(label),
+    h("input", {
+      type: inputType || "text",
+      value: value || "",
+      name: field,
+      onchange: (_, e) => [
+        SetStepField,
+        { index, field, value: e.target.value },
+      ],
+    }),
+  ]);
+};
+
+const stepRow = function (step, index, count) {
+  return h("li", { className: "step-row" }, [
+    h("div", { className: "step-type" }, text(stepTypeLabel(step.type))),
+    h(
+      "div",
+      { className: "step-fields" },
+      [
+        (step.type == "click" || step.type == "change") &&
+          stepField(
+            chrome.i18n.getMessage("optionFieldPath"),
+            index,
+            "target",
+            step.target
+          ),
+        (step.type == "click" || step.type == "change") &&
+          stepField(
+            chrome.i18n.getMessage("optionFieldName"),
+            index,
+            "name",
+            step.name
+          ),
+        (step.type == "click" || step.type == "change") &&
+          stepField(
+            chrome.i18n.getMessage("optionFieldText"),
+            index,
+            "text",
+            step.text
+          ),
+        step.type == "change" &&
+          stepField(
+            chrome.i18n.getMessage("optionFieldValue"),
+            index,
+            "value",
+            step.value
+          ),
+        step.type == "wait" &&
+          stepField(
+            chrome.i18n.getMessage("optionFieldDuration"),
+            index,
+            "duration",
+            step.duration,
+            "number"
+          ),
+      ]
+    ),
+    h("div", { className: "step-actions" }, [
+      h(
+        "button",
+        {
+          disabled: index == 0,
+          title: chrome.i18n.getMessage("optionMoveUp"),
+          onclick: [MoveStep, { index, dir: -1 }],
+        },
+        text("↑")
+      ),
+      h(
+        "button",
+        {
+          disabled: index == count - 1,
+          title: chrome.i18n.getMessage("optionMoveDown"),
+          onclick: [MoveStep, { index, dir: 1 }],
+        },
+        text("↓")
+      ),
+      h(
+        "button",
+        {
+          title: chrome.i18n.getMessage("optionRemoveStep"),
+          onclick: [RemoveStep, index],
+        },
+        text("✕")
+      ),
+    ]),
+  ]);
+};
+
+const findPrefix = function (database, url) {
   var prefix = "";
-  if (state.database.prefix) {
-    for (var key in state.database.prefix) {
-      if (state.database.prefix[key] == url) {
+  if (database.prefix) {
+    for (var key in database.prefix) {
+      if (database.prefix[key] == url) {
         prefix = key;
       }
     }
   }
-  return { ...state, url, prefix, oldPrefix: prefix, importStatus: "" };
+  return prefix;
+};
+
+const initialOpenUrl =
+  new URLSearchParams(window.location.search).get("open") || "";
+
+const SetDatabase = (state, database) => {
+  if (state.openRequested && "data/" + state.openRequested in database) {
+    return SelectPage({ ...state, database }, state.openRequested);
+  }
+  return { ...state, database };
+};
+const SelectPage = (state, url) => {
+  const prefix = findPrefix(state.database, url);
+  return {
+    ...state,
+    url,
+    prefix,
+    oldPrefix: prefix,
+    importStatus: "",
+    editing: false,
+    editSteps: null,
+  };
 };
 const ExportMacro = (state) => [
   state,
@@ -162,6 +284,48 @@ const ImportMacro = (state) => [
 const SetPrefix = (state, prefix) => ({ ...state, prefix });
 const SetImportStatus = (state, importStatus) => ({ ...state, importStatus });
 
+const StartEditSteps = (state) => ({
+  ...state,
+  editing: true,
+  editSteps: state.database["data/" + state.url].steps.map((s) => ({ ...s })),
+});
+const CancelEdit = (state) => ({ ...state, editing: false, editSteps: null });
+const SetStepField = (state, { index, field, value }) => ({
+  ...state,
+  editSteps: state.editSteps.map((s, i) => {
+    if (i != index) return s;
+    const step = { ...s };
+    if (value == "" && (field == "name" || field == "text")) {
+      delete step[field];
+    } else {
+      step[field] = value;
+    }
+    return step;
+  }),
+});
+const MoveStep = (state, { index, dir }) => {
+  const target = index + dir;
+  if (target < 0 || target >= state.editSteps.length) return state;
+  const editSteps = state.editSteps.slice();
+  [editSteps[index], editSteps[target]] = [editSteps[target], editSteps[index]];
+  return { ...state, editSteps };
+};
+const RemoveStep = (state, index) => ({
+  ...state,
+  editSteps: state.editSteps.filter((_, i) => i != index),
+});
+const AddStep = (state, type) => ({
+  ...state,
+  editSteps: [
+    ...state.editSteps,
+    type == "wait" ? { type: "wait", duration: "1000" } : { type: "close" },
+  ],
+});
+const SaveSteps = (state) => [
+  { ...state, editing: false, editSteps: null },
+  [saveSteps, { url: state.url, steps: state.editSteps }],
+];
+
 const databaseSubscription = [
   (dispatch, _) => {
     chrome.storage.local.get(null, (database) => {
@@ -177,7 +341,16 @@ const databaseSubscription = [
 ];
 
 app({
-  init: { database: {}, url: "", oldPrefix: "", prefix: "", importStatus: "" },
+  init: {
+    database: {},
+    url: "",
+    oldPrefix: "",
+    prefix: "",
+    importStatus: "",
+    editing: false,
+    editSteps: null,
+    openRequested: initialOpenUrl,
+  },
   view: (state) => {
     return h("main", {}, [
       h("div", { className: "card" }, [
@@ -211,6 +384,46 @@ app({
               ]
             ),
             url == state.url &&
+              state.editing &&
+              h("div", { className: "body" }, [
+                h("ol", { className: "steps editing" }, [
+                  ...state.editSteps.map((step, index) =>
+                    stepRow(step, index, state.editSteps.length)
+                  ),
+                  h("li", { className: "add-step-row" }, [
+                    h(
+                      "select",
+                      {
+                        className: "add-step",
+                        onchange: (s, e) => {
+                          const type = e.target.value;
+                          e.target.value = "addstep";
+                          return type == "addstep" ? s : [AddStep, type];
+                        },
+                      },
+                      [
+                        h(
+                          "option",
+                          { value: "addstep" },
+                          text(chrome.i18n.getMessage("optionAddStep"))
+                        ),
+                        h(
+                          "option",
+                          { value: "wait" },
+                          text(chrome.i18n.getMessage("optionInsertWait"))
+                        ),
+                        h(
+                          "option",
+                          { value: "close" },
+                          text(chrome.i18n.getMessage("optionCloseTab"))
+                        ),
+                      ]
+                    ),
+                  ]),
+                ]),
+              ]),
+            url == state.url &&
+              !state.editing &&
               h("div", { className: "body" }, [
                 h(
                   "ol",
@@ -256,29 +469,51 @@ app({
                 ]),
               ]),
             url == state.url &&
-              h("div", { className: "actions" }, [
-                state.prefix != state.oldPrefix &&
-                  h(
-                    "button",
-                    { onclick: SaveMacro },
-                    text(chrome.i18n.getMessage("optionSave"))
-                  ),
-                h(
-                  "button",
-                  { onclick: ExportMacro },
-                  text(chrome.i18n.getMessage("optionExport"))
-                ),
-                h(
-                  "button",
-                  { onclick: DeleteMacro },
-                  text(chrome.i18n.getMessage("optionDelete"))
-                ),
-                h(
-                  "button",
-                  { onclick: OpenPage },
-                  text(chrome.i18n.getMessage("optionOpen"))
-                ),
-              ]),
+              h(
+                "div",
+                { className: "actions" },
+                state.editing
+                  ? [
+                      h(
+                        "button",
+                        { onclick: SaveSteps },
+                        text(chrome.i18n.getMessage("optionSaveSteps"))
+                      ),
+                      h(
+                        "button",
+                        { onclick: CancelEdit },
+                        text(chrome.i18n.getMessage("optionCancelEdit"))
+                      ),
+                    ]
+                  : [
+                      state.prefix != state.oldPrefix &&
+                        h(
+                          "button",
+                          { onclick: SaveMacro },
+                          text(chrome.i18n.getMessage("optionSave"))
+                        ),
+                      h(
+                        "button",
+                        { onclick: StartEditSteps },
+                        text(chrome.i18n.getMessage("optionEditSteps"))
+                      ),
+                      h(
+                        "button",
+                        { onclick: ExportMacro },
+                        text(chrome.i18n.getMessage("optionExport"))
+                      ),
+                      h(
+                        "button",
+                        { onclick: DeleteMacro },
+                        text(chrome.i18n.getMessage("optionDelete"))
+                      ),
+                      h(
+                        "button",
+                        { onclick: OpenPage },
+                        text(chrome.i18n.getMessage("optionOpen"))
+                      ),
+                    ]
+              ),
           ])
         ),
     ]);

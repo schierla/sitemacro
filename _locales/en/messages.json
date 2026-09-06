@@ -102,6 +102,10 @@
         "message": "Delete",
         "description": "Button to delete the macro"
     },
+    "popupEdit": {
+        "message": "Edit",
+        "description": "Button to edit the macro"
+    },
     "popup0Step": {
         "message": "0 steps",
         "description": "Text for macros containing no steps"
@@ -182,11 +186,11 @@
         "description": "Dummy element in macro list"
     },
     "optionDelete": {
-        "message": "Delete", 
+        "message": "Delete Macro", 
         "description": "Button to delete selected macro"
     }, 
     "optionExport": {
-        "message": "Export", 
+        "message": "Export Macro", 
         "description": "Button to export selected macro to file"
     }, 
     "optionImport": {
@@ -210,10 +214,82 @@
         "description": "Option to apply macro to all pages starting with the given URL"
     },
     "optionOpen": {
-        "message": "Open",
+        "message": "Open Page",
         "description": "Button to open the page"
     },
-        
+    "optionEditSteps": {
+        "message": "Edit Steps",
+        "description": "Button to start editing the steps of the selected macro"
+    },
+    "optionSaveSteps": {
+        "message": "Save Steps",
+        "description": "Button to save the edited steps of the selected macro"
+    },
+    "optionCancelEdit": {
+        "message": "Cancel",
+        "description": "Button to discard changes made while editing steps"
+    },
+    "optionMoveUp": {
+        "message": "Move up",
+        "description": "Button to move a step one position up"
+    },
+    "optionMoveDown": {
+        "message": "Move down",
+        "description": "Button to move a step one position down"
+    },
+    "optionRemoveStep": {
+        "message": "Remove",
+        "description": "Button to remove a step while editing"
+    },
+    "optionAddStep": {
+        "message": "add step...",
+        "description": "Drop down to add a new step while editing a macro"
+    },
+    "optionInsertWait": {
+        "message": "Insert delay",
+        "description": "Option to add a wait step while editing a macro"
+    },
+    "optionCloseTab": {
+        "message": "Close tab",
+        "description": "Option to add a close step while editing a macro"
+    },
+    "optionFieldPath": {
+        "message": "Path",
+        "description": "Label for the element path field while editing a step"
+    },
+    "optionFieldName": {
+        "message": "Name",
+        "description": "Label for the element name field while editing a step"
+    },
+    "optionFieldText": {
+        "message": "Text",
+        "description": "Label for the element text field while editing a step"
+    },
+    "optionFieldValue": {
+        "message": "Value",
+        "description": "Label for the value field while editing a change step"
+    },
+    "optionFieldDuration": {
+        "message": "Duration (ms)",
+        "description": "Label for the duration field while editing a wait step"
+    },
+    "optionTypeClick": {
+        "message": "Click",
+        "description": "Type label for a click step while editing"
+    },
+    "optionTypeChange": {
+        "message": "Change",
+        "description": "Type label for a change step while editing"
+    },
+    "optionTypeWait": {
+        "message": "Wait",
+        "description": "Type label for a wait step while editing"
+    },
+    "optionTypeClose": {
+        "message": "Close Tab",
+        "description": "Type label for a close step while editing"
+    },
+
     "pageRecording": {
         "message": "SiteMacro: Recording...",
         "description": "Text shown in page while recording"

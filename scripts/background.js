@@ -92,6 +92,8 @@ var siteMacro = {
       siteMacro.createPrefix(msg.prefix, msg.url);
     } else if (msg.command == "deletePrefix") {
       siteMacro.deletePrefix(msg.prefix);
+    } else if (msg.command == "update") {
+      siteMacro.updateMacroSteps(msg.url, msg.steps);
     } else if (msg.command == "closeTab") {
       chrome.tabs.remove(sender.tab.id);
     } else if (msg.command == "record") {
@@ -177,6 +179,15 @@ var siteMacro = {
     data[key] = { steps: steps, created: Date.now(), last: Date.now() - 15000 };
     siteMacro.database[key] = data[key];
     chrome.storage.local.set(data, () => {});
+  },
+
+  updateMacroSteps: function (url, steps) {
+    var key = "data/" + url;
+    if (!(key in siteMacro.database)) return;
+    siteMacro.database[key].steps = steps;
+    const update = {};
+    update[key] = siteMacro.database[key];
+    chrome.storage.local.set(update);
   },
 
   deleteMacro: function (url) {
